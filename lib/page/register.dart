@@ -254,7 +254,7 @@ class _registerPageState extends State<registerPage> {
                         vertical: 14.0), // เพิ่มระยะห่างภายในกล่องข้อความ
                   ),
                 ),
-                SizedBox(height: 35), // เพิ่มระยะห่างระหว่างกล่องข้อความ
+                SizedBox(height: 25), // เพิ่มระยะห่างระหว่างกล่องข้อความ
                 TextField(
                   controller: _passwordController,
                   obscureText: _obscureText, // ใช้สถานะในการควบคุมการมองเห็น
