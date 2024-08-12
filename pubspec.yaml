@@ -52,6 +52,7 @@ dev_dependencies:
 
 # The following section is specific to Flutter packages.
 flutter:
+    
 
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
@@ -62,6 +63,10 @@ flutter:
   assets:
     - assets/config/
     - assets/img/Lotto.png
+  fonts:
+    - family: Revalia
+      fonts:
+        - asset: assets/font/Revalia-Regular.ttf
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

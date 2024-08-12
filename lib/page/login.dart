@@ -29,11 +29,12 @@ class _LoginPageState extends State<LoginPage> {
                 style: TextStyle(
                   fontSize: 30,
                   fontWeight: FontWeight.bold,
+                  fontFamily: 'Revalia', // ใช้ฟอนต์ Revalia
                   color: Color(0xFF471AA0),
                 ),
               ),
             ),
-            SizedBox(height: 10),
+            SizedBox(height: 20),
             Center(
               child: Image.asset(
                 'assets/img/Lotto.png',
