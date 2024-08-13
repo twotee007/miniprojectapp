@@ -1,6 +1,11 @@
+import 'dart:developer';
+
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:miniprojectapp/config/config.dart';
 import 'package:miniprojectapp/page/login.dart';
+import 'package:miniprojectapp/request/register_post_req.dart';
+import 'package:http/http.dart' as http;
 
 class registerPage extends StatefulWidget {
   const registerPage({super.key});
@@ -10,12 +15,23 @@ class registerPage extends StatefulWidget {
 }
 
 class _registerPageState extends State<registerPage> {
-  TextEditingController _usernameController = TextEditingController();
-  TextEditingController _fullnameController = TextEditingController();
-  TextEditingController _addmoneyController = TextEditingController();
-  TextEditingController _emailController = TextEditingController();
-  TextEditingController _passwordController = TextEditingController();
+  var usernameController = TextEditingController();
+  var fullnameController = TextEditingController();
+  var addmoneyController = TextEditingController();
+  var emailController = TextEditingController();
+  var passwordController = TextEditingController();
   bool _obscureText = true;
+  String text = '';
+  String url = '';
+  void initState() {
+    super.initState();
+    Configuration.getConfig().then(
+      (value) {
+        log(value['apiEndPoint']);
+        url = value['apiEndPoint'];
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -29,7 +45,7 @@ class _registerPageState extends State<registerPage> {
             child: Container(
               width: 142,
               height: 142,
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 color: Color(0xFF471AA0), // สีม่วงเข้ม
                 shape: BoxShape.circle,
               ),
@@ -41,7 +57,7 @@ class _registerPageState extends State<registerPage> {
             child: Container(
               width: 142,
               height: 142,
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 color: Color(0xFFC17E7E), // สีชมพูอ่อน
                 shape: BoxShape.circle,
               ),
@@ -55,14 +71,15 @@ class _registerPageState extends State<registerPage> {
             child: Row(
               children: [
                 IconButton(
-                  icon: Icon(Icons.chevron_left, size: 30), // ขนาดของไอคอน
-                  color: Color(0xFF471AA0), // สีของ chevron
+                  icon:
+                      const Icon(Icons.chevron_left, size: 30), // ขนาดของไอคอน
+                  color: const Color(0xFF471AA0), // สีของ chevron
                   onPressed: () {
                     Navigator.pop(context); // กลับไปยังหน้าก่อนหน้า
                   },
                 ),
-                SizedBox(width: 8), // ช่องว่างระหว่างไอคอนและข้อความ
-                Text(
+                const SizedBox(width: 8), // ช่องว่างระหว่างไอคอนและข้อความ
+                const Text(
                   'Back',
                   style: TextStyle(
                     fontSize: 18,
@@ -80,7 +97,7 @@ class _registerPageState extends State<registerPage> {
             left: 20, // ปรับตำแหน่งตามที่คุณต้องการ
             child: Row(
               children: [
-                Text(
+                const Text(
                   'Sign up',
                   style: TextStyle(
                     fontSize: 24,
@@ -88,17 +105,17 @@ class _registerPageState extends State<registerPage> {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                SizedBox(width: 130), // ช่องว่างระหว่างข้อความและไอคอน
+                const SizedBox(width: 130), // ช่องว่างระหว่างข้อความและไอคอน
                 Container(
-                  padding: EdgeInsets.all(8), // ขนาดของวงกลมรอบไอคอน
+                  padding: const EdgeInsets.all(8), // ขนาดของวงกลมรอบไอคอน
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     border: Border.all(
-                      color: Color(0xFF471AA0), // สีของเส้นวงกลม
+                      color: const Color(0xFF471AA0), // สีของเส้นวงกลม
                       width: 2, // ความหนาของเส้นวงกลม
                     ),
                   ),
-                  child: Icon(
+                  child: const Icon(
                     Icons.person_add, // ใช้ไอคอน add person
                     size: 70, // ขนาดของไอคอน
                     color: Color(0xFF471AA0), // สีของไอคอน
@@ -116,154 +133,155 @@ class _registerPageState extends State<registerPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                SizedBox(
+                const SizedBox(
                     height: 25), // เพิ่มระยะห่างระหว่างข้อความและกล่องข้อความ
                 TextField(
-                  controller: _usernameController,
+                  controller: usernameController,
                   decoration: InputDecoration(
-                    prefixIcon: Icon(Icons.person_4_outlined,
+                    prefixIcon: const Icon(Icons.person_4_outlined,
                         color: Color(0xFF471AA0)), // ไอคอนด้านซ้าย
                     labelText: 'Username',
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12.0),
-                      borderSide: BorderSide(
+                      borderSide: const BorderSide(
                         width: 1.0,
                         color: Color(0xFF9747FF),
                       ),
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12.0),
-                      borderSide: BorderSide(
+                      borderSide: const BorderSide(
                         width: 1.0,
                         color: Color(0xFF9747FF),
                       ),
                     ),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12.0),
-                      borderSide: BorderSide(
+                      borderSide: const BorderSide(
                         width: 2.0,
                         color: Color(0xFF9747FF),
                       ),
                     ),
-                    contentPadding: EdgeInsets.symmetric(
+                    contentPadding: const EdgeInsets.symmetric(
                         horizontal: 16.0,
                         vertical: 14.0), // เพิ่มระยะห่างภายในกล่องข้อความ
                   ),
                 ),
-                SizedBox(
+                const SizedBox(
                     height: 25), // เพิ่มระยะห่างระหว่างข้อความและกล่องข้อความ
                 TextField(
-                  controller: _fullnameController,
+                  controller: fullnameController,
                   decoration: InputDecoration(
-                    prefixIcon: Icon(Icons.person_pin_outlined,
+                    prefixIcon: const Icon(Icons.person_pin_outlined,
                         color: Color(0xFF471AA0)), // ไอคอนด้านซ้าย
                     labelText: 'Fullname',
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12.0),
-                      borderSide: BorderSide(
+                      borderSide: const BorderSide(
                         width: 1.0,
                         color: Color(0xFF9747FF),
                       ),
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12.0),
-                      borderSide: BorderSide(
+                      borderSide: const BorderSide(
                         width: 1.0,
                         color: Color(0xFF9747FF),
                       ),
                     ),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12.0),
-                      borderSide: BorderSide(
+                      borderSide: const BorderSide(
                         width: 2.0,
                         color: Color(0xFF9747FF),
                       ),
                     ),
-                    contentPadding: EdgeInsets.symmetric(
+                    contentPadding: const EdgeInsets.symmetric(
                         horizontal: 16.0,
                         vertical: 14.0), // เพิ่มระยะห่างภายในกล่องข้อความ
                   ),
                 ),
-                SizedBox(
+                const SizedBox(
                     height: 25), // เพิ่มระยะห่างระหว่างข้อความและกล่องข้อความ
                 TextField(
-                  controller: _addmoneyController,
+                  controller: addmoneyController,
                   decoration: InputDecoration(
-                    prefixIcon: Icon(Icons.monetization_on,
+                    prefixIcon: const Icon(Icons.monetization_on,
                         color: Color(
                             0xFF471AA0)), // เปลี่ยนไอคอนด้านซ้ายเป็นไอคอนสัญลักษณ์เงิน
                     labelText: 'Addmoney',
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12.0),
-                      borderSide: BorderSide(
+                      borderSide: const BorderSide(
                         width: 1.0,
                         color: Color(0xFF9747FF),
                       ),
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12.0),
-                      borderSide: BorderSide(
+                      borderSide: const BorderSide(
                         width: 1.0,
                         color: Color(0xFF9747FF),
                       ),
                     ),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12.0),
-                      borderSide: BorderSide(
+                      borderSide: const BorderSide(
                         width: 2.0,
                         color: Color(0xFF9747FF),
                       ),
                     ),
-                    contentPadding: EdgeInsets.symmetric(
+                    contentPadding: const EdgeInsets.symmetric(
                         horizontal: 16.0,
                         vertical: 14.0), // เพิ่มระยะห่างภายในกล่องข้อความ
                   ),
                 ),
 
-                SizedBox(
+                const SizedBox(
                     height: 25), // เพิ่มระยะห่างระหว่างข้อความและกล่องข้อความ
                 TextField(
-                  controller: _emailController,
+                  controller: emailController,
                   decoration: InputDecoration(
-                    prefixIcon: Icon(Icons.email_outlined,
+                    prefixIcon: const Icon(Icons.email_outlined,
                         color: Color(0xFF471AA0)), // ไอคอนด้านซ้าย
                     labelText: 'Email',
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12.0),
-                      borderSide: BorderSide(
+                      borderSide: const BorderSide(
                         width: 1.0,
                         color: Color(0xFF9747FF),
                       ),
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12.0),
-                      borderSide: BorderSide(
+                      borderSide: const BorderSide(
                         width: 1.0,
                         color: Color(0xFF9747FF),
                       ),
                     ),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12.0),
-                      borderSide: BorderSide(
+                      borderSide: const BorderSide(
                         width: 2.0,
                         color: Color(0xFF9747FF),
                       ),
                     ),
-                    contentPadding: EdgeInsets.symmetric(
+                    contentPadding: const EdgeInsets.symmetric(
                         horizontal: 16.0,
                         vertical: 14.0), // เพิ่มระยะห่างภายในกล่องข้อความ
                   ),
                 ),
-                SizedBox(height: 25), // เพิ่มระยะห่างระหว่างกล่องข้อความ
+                const SizedBox(height: 25), // เพิ่มระยะห่างระหว่างกล่องข้อความ
                 TextField(
-                  controller: _passwordController,
+                  controller: passwordController,
                   obscureText: _obscureText, // ใช้สถานะในการควบคุมการมองเห็น
                   decoration: InputDecoration(
-                    prefixIcon: Icon(Icons.lock, color: Color(0xFF471AA0)),
+                    prefixIcon:
+                        const Icon(Icons.lock, color: Color(0xFF471AA0)),
                     suffixIcon: IconButton(
                       icon: Icon(
                         _obscureText ? Icons.visibility_off : Icons.visibility,
-                        color: Color(0xFF9747FF),
+                        color: const Color(0xFF9747FF),
                       ),
                       onPressed: () {
                         setState(() {
@@ -274,56 +292,59 @@ class _registerPageState extends State<registerPage> {
                     labelText: 'Password',
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12.0),
-                      borderSide: BorderSide(
+                      borderSide: const BorderSide(
                         width: 1.0,
                         color: Color(0xFF9747FF),
                       ),
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12.0),
-                      borderSide: BorderSide(
+                      borderSide: const BorderSide(
                         width: 1.0,
                         color: Color(0xFF9747FF),
                       ),
                     ),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12.0),
-                      borderSide: BorderSide(
+                      borderSide: const BorderSide(
                         width: 2.0,
                         color: Color(0xFF9747FF),
                       ),
                     ),
-                    contentPadding: EdgeInsets.symmetric(
+                    contentPadding: const EdgeInsets.symmetric(
                         horizontal: 16.0,
                         vertical: 14.0), // เพิ่มระยะห่างภายในกล่องข้อความ
                   ),
                 ),
-                SizedBox(height: 20),
+                const SizedBox(height: 10),
+                Center(
+                  child: Text(text),
+                ),
                 SizedBox(
                   width: double.infinity,
                   child: FilledButton(
                     onPressed: () {
-                      // Add your login logic here
+                      signup();
                     },
                     style: ButtonStyle(
-                      backgroundColor:
-                          MaterialStateProperty.all<Color>(Color(0xFF44CEA8)),
+                      backgroundColor: MaterialStateProperty.all<Color>(
+                          const Color(0xFF44CEA8)),
                     ),
-                    child: Text('Sign in'),
+                    child: const Text('Sign in'),
                   ),
                 ),
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
                 Center(
                   child: RichText(
                     text: TextSpan(
                       text: "Already have an account ? ",
-                      style: TextStyle(
+                      style: const TextStyle(
                         color: Colors.black,
                       ),
                       children: <TextSpan>[
                         TextSpan(
                           text: 'Sign in',
-                          style: TextStyle(
+                          style: const TextStyle(
                             color: Color(0xFF471AA0),
                             fontWeight: FontWeight.bold,
                           ),
@@ -332,7 +353,7 @@ class _registerPageState extends State<registerPage> {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => LoginPage(),
+                                  builder: (context) => const LoginPage(),
                                 ),
                               );
                             },
@@ -347,5 +368,42 @@ class _registerPageState extends State<registerPage> {
         ],
       ),
     );
+  }
+
+  void signup() {
+    if (usernameController.text.isEmpty ||
+        fullnameController.text.isEmpty ||
+        addmoneyController.text.isEmpty ||
+        emailController.text.isEmpty ||
+        passwordController.text.isEmpty) {
+      setState(() {
+        text = "กรุณากรอกข้อมูลให้ครบทุกช่อง";
+        return;
+      });
+    } else {
+      var model = RegisterPostReq(
+          username: usernameController.text,
+          password: passwordController.text,
+          fullname: fullnameController.text,
+          wallet: int.parse(addmoneyController.text), // Convert String to int
+          email: emailController.text,
+          img: "");
+      http
+          .post(Uri.parse('$url/users/adduser'),
+              headers: {"Content-Type": "application/json; charset=utf-8"},
+              body: registerPostReqToJson(model))
+          .then(
+        (value) {
+          log(value.body);
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const LoginPage(),
+              ));
+        },
+      ).catchError((err) {
+        log(err.toString());
+      });
+    }
   }
 }

@@ -1,6 +1,12 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart'; // Import for TapGestureRecognizer
+import 'package:miniprojectapp/config/config.dart';
+import 'package:miniprojectapp/request/user_post_req.dart';
+import 'package:miniprojectapp/response/user_post_res.dart';
 import 'register.dart'; // Import your register page
+import 'package:http/http.dart' as http;
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -10,9 +16,21 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  TextEditingController _emailController = TextEditingController();
-  TextEditingController _passwordController = TextEditingController();
+  TextEditingController usernameController = TextEditingController();
+  TextEditingController passwordController = TextEditingController();
   bool _obscureText = true;
+  String url = '';
+  String text = '';
+  @override
+  void initState() {
+    super.initState();
+    Configuration.getConfig().then(
+      (value) {
+        log(value['apiEndPoint']);
+        url = value['apiEndPoint'];
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -23,7 +41,7 @@ class _LoginPageState extends State<LoginPage> {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            Center(
+            const Center(
               child: Text(
                 'LOTTO168',
                 style: TextStyle(
@@ -34,15 +52,15 @@ class _LoginPageState extends State<LoginPage> {
                 ),
               ),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             Center(
               child: Image.asset(
                 'assets/img/Lotto.png',
                 height: 100,
               ),
             ),
-            SizedBox(height: 20),
-            Text(
+            const SizedBox(height: 20),
+            const Text(
               'Sign in',
               style: TextStyle(
                 fontSize: 25,
@@ -50,46 +68,50 @@ class _LoginPageState extends State<LoginPage> {
                 color: Color(0xFF471AA0),
               ),
             ),
-            SizedBox(height: 25), // เพิ่มระยะห่างระหว่างข้อความและกล่องข้อความ
+            const SizedBox(
+                height: 25), // เพิ่มระยะห่างระหว่างข้อความและกล่องข้อความ
             TextField(
-              controller: _emailController,
+              controller: usernameController,
               decoration: InputDecoration(
-                prefixIcon: Icon(Icons.person_4_outlined, color: Color(0xFF471AA0)), // ไอคอนด้านซ้าย
-                labelText: 'Email or Username',
+                prefixIcon: const Icon(Icons.person_4_outlined,
+                    color: Color(0xFF471AA0)), // ไอคอนด้านซ้าย
+                labelText: 'Username',
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12.0),
-                  borderSide: BorderSide(
+                  borderSide: const BorderSide(
                     width: 1.0,
                     color: Color(0xFF9747FF),
                   ),
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12.0),
-                  borderSide: BorderSide(
+                  borderSide: const BorderSide(
                     width: 1.0,
                     color: Color(0xFF9747FF),
                   ),
                 ),
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12.0),
-                  borderSide: BorderSide(
+                  borderSide: const BorderSide(
                     width: 2.0,
                     color: Color(0xFF9747FF),
                   ),
                 ),
-                contentPadding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 14.0), // เพิ่มระยะห่างภายในกล่องข้อความ
+                contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 16.0,
+                    vertical: 14.0), // เพิ่มระยะห่างภายในกล่องข้อความ
               ),
             ),
-            SizedBox(height: 35), // เพิ่มระยะห่างระหว่างกล่องข้อความ
+            const SizedBox(height: 35), // เพิ่มระยะห่างระหว่างกล่องข้อความ
             TextField(
-              controller: _passwordController,
+              controller: passwordController,
               obscureText: _obscureText, // ใช้สถานะในการควบคุมการมองเห็น
               decoration: InputDecoration(
-                prefixIcon: Icon(Icons.lock, color: Color(0xFF471AA0)),
+                prefixIcon: const Icon(Icons.lock, color: Color(0xFF471AA0)),
                 suffixIcon: IconButton(
                   icon: Icon(
                     _obscureText ? Icons.visibility_off : Icons.visibility,
-                    color: Color(0xFF9747FF),
+                    color: const Color(0xFF9747FF),
                   ),
                   onPressed: () {
                     setState(() {
@@ -100,26 +122,28 @@ class _LoginPageState extends State<LoginPage> {
                 labelText: 'Password',
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12.0),
-                  borderSide: BorderSide(
+                  borderSide: const BorderSide(
                     width: 1.0,
                     color: Color(0xFF9747FF),
                   ),
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12.0),
-                  borderSide: BorderSide(
+                  borderSide: const BorderSide(
                     width: 1.0,
                     color: Color(0xFF9747FF),
                   ),
                 ),
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12.0),
-                  borderSide: BorderSide(
+                  borderSide: const BorderSide(
                     width: 2.0,
                     color: Color(0xFF9747FF),
                   ),
                 ),
-                contentPadding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 14.0), // เพิ่มระยะห่างภายในกล่องข้อความ
+                contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 16.0,
+                    vertical: 14.0), // เพิ่มระยะห่างภายในกล่องข้อความ
               ),
             ),
             Align(
@@ -128,7 +152,7 @@ class _LoginPageState extends State<LoginPage> {
                 onPressed: () {
                   // Add your forget password logic here
                 },
-                child: Text(
+                child: const Text(
                   'Forget password?',
                   style: TextStyle(
                     color: Color(0xFF471AA0),
@@ -137,32 +161,35 @@ class _LoginPageState extends State<LoginPage> {
                 ),
               ),
             ),
-            SizedBox(height: 20),
+            Center(
+              child: Text(text),
+            ),
+            const SizedBox(height: 10),
             SizedBox(
               width: double.infinity,
               child: FilledButton(
                 onPressed: () {
-                  // Add your login logic here
+                  login();
                 },
                 style: ButtonStyle(
                   backgroundColor:
-                      MaterialStateProperty.all<Color>(Color(0xFF44CEA8)),
+                      MaterialStateProperty.all<Color>(const Color(0xFF44CEA8)),
                 ),
-                child: Text('Sign in'),
+                child: const Text('Sign in'),
               ),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             Center(
               child: RichText(
                 text: TextSpan(
                   text: "Don't have an account? ",
-                  style: TextStyle(
+                  style: const TextStyle(
                     color: Colors.black,
                   ),
                   children: <TextSpan>[
                     TextSpan(
                       text: 'Sign up',
-                      style: TextStyle(
+                      style: const TextStyle(
                         color: Color(0xFF471AA0),
                         fontWeight: FontWeight.bold,
                       ),
@@ -171,7 +198,7 @@ class _LoginPageState extends State<LoginPage> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => registerPage(),
+                              builder: (context) => const registerPage(),
                             ),
                           );
                         },
@@ -184,5 +211,30 @@ class _LoginPageState extends State<LoginPage> {
         ),
       ),
     );
+  }
+
+  void login() async {
+    var model = UserPostReq(
+        username: usernameController.text, password: passwordController.text);
+    try {
+      var value = await http.post(Uri.parse("$url/users/login"),
+          headers: {"Content-Type": "application/json; charset=utf-8"},
+          //         //JsonEncode() = Covert Object to json string
+          //         // body : jsonEncode(data)
+          body: userPostReqToJson(model));
+      List<UserPostRes> users = userPostResFromJson(value.body);
+      log(users[0].uid.toString());
+      // Navigator.push(
+      //     context,
+      //     MaterialPageRoute(
+      //       builder: (context) => ShowtripPage(),
+      //     ));
+    } catch (err) {
+      log(err.toString());
+      setState(() {
+        log('ERROR');
+        text = "Username no or Password Incorrect";
+      });
+    }
   }
 }
