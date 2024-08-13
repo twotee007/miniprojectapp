@@ -1,8 +1,19 @@
 import 'dart:ui'; // Import for the BackdropFilter
 import 'package:flutter/material.dart';
+import 'package:miniprojectapp/page/Widget.dart';
+import 'package:miniprojectapp/page/lotto.dart';
+import 'package:miniprojectapp/page/user.dart';
+import 'package:miniprojectapp/page/wallet.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   const HomePage({super.key});
+
+  @override
+  _HomePage createState() => _HomePage();
+}
+
+class _HomePage extends State<HomePage> {
+  String activePage = 'home'; // State variable to track the active page
 
   @override
   Widget build(BuildContext context) {
@@ -20,7 +31,7 @@ class HomePage extends StatelessWidget {
                   child: Container(
                     width: 299.87,
                     height: 293.07,
-                    decoration: BoxDecoration(
+                    decoration: const BoxDecoration(
                       shape: BoxShape.circle,
                       color: Color(0xFF471AA0), // Dark purple
                     ),
@@ -33,7 +44,7 @@ class HomePage extends StatelessWidget {
                   child: Container(
                     width: 332.67,
                     height: 325.13,
-                    decoration: BoxDecoration(
+                    decoration: const BoxDecoration(
                       shape: BoxShape.circle,
                       color: Color(0xFFBB84E8), // Light purple
                     ),
@@ -54,7 +65,7 @@ class HomePage extends StatelessWidget {
             ),
           ),
           // Text at the Top-Left
-          Positioned(
+          const Positioned(
             top: 60,
             left: 30,
             child: Text(
@@ -70,12 +81,12 @@ class HomePage extends StatelessWidget {
           Align(
             alignment: Alignment.center,
             child: Container(
-              margin: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-              padding: EdgeInsets.all(16),
+              margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+              padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(16.0),
-                boxShadow: [
+                boxShadow: const [
                   BoxShadow(
                     color: Colors.black26,
                     blurRadius: 8.0,
@@ -85,14 +96,14 @@ class HomePage extends StatelessWidget {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text(
+                  const Text(
                     'ประกาศผลรางวัล',
                     style: TextStyle(
                       fontFamily: 'Revalia', // Use Revalia font
                       fontSize: 24.0,
                     ),
                   ),
-                  SizedBox(height: 16.0),
+                  const SizedBox(height: 16.0),
                   _buildPrizeRow('รางวัลที่ 1', '2000 บาท'),
                   _buildPrizeRow('รางวัลที่ 2', '1500 บาท'),
                   _buildPrizeRow('รางวัลที่ 3', '1000 บาท'),
@@ -105,41 +116,62 @@ class HomePage extends StatelessWidget {
           // Bottom Navigation Bar
           Align(
             alignment: Alignment.bottomCenter,
-            child: Container(
-              color: Color(0xFF735DB8), // Light purple
-              padding: EdgeInsets.symmetric(vertical: 20),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  // Replace icon with asset image
-                  Image.asset(
-                    'assets/images/home.png', // Replace with your asset path
-                    color: Colors.white,
-                    width: 24, // Adjust width as needed
-                    height: 24, // Adjust height as needed
-                  ),
-                  Image.asset(
-                    'assets/images/shopping_cart.png', // Replace with your asset path
-                    color: Colors.white,
-                    width: 24, // Adjust width as needed
-                    height: 24, // Adjust height as needed
-                  ),
-                  Image.asset(
-                    'assets/images/account_balance_wallet.png', // Replace with your asset path
-                    color: Colors.white,
-                    width: 24, // Adjust width as needed
-                    height: 24, // Adjust height as needed
-                  ),
-                  Image.asset(
-                    'assets/images/person.png', // Replace with your asset path
-                    color: Colors.white,
-                    width: 24, // Adjust width as needed
-                    height: 24, // Adjust height as needed
-                  ),
-                ],
-              ),
+            child: BottomNavBar(
+              activePage: 'home',
+              onNavItemTapped: (page) {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) {
+                    switch (page) {
+                      case 'home':
+                        return HomePage();
+                      case 'lotto':
+                        return LottoPage();
+                      case 'wallet':
+                        return WalletPage();
+                      case 'user':
+                        return UserPage();
+                      default:
+                        return HomePage();
+                    }
+                  }),
+                );
+              },
             ),
-          )
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildNavItem(String assetPath, String label,
+      {bool isActive = false, VoidCallback? onPressed}) {
+    return GestureDetector(
+      onTap: onPressed,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            decoration: BoxDecoration(
+              border:
+                  isActive ? Border.all(color: Colors.red, width: 2.0) : null,
+              borderRadius: BorderRadius.circular(8.0),
+            ),
+            child: Image.asset(
+              assetPath,
+              color: Colors.white,
+              width: 60, // Adjust width as needed
+              height: 30, // Adjust height as needed
+            ),
+          ),
+          const SizedBox(height: 4), // Spacing between icon and text
+          Text(
+            label,
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 15, // Adjust font size as needed
+            ),
+          ),
         ],
       ),
     );
@@ -151,8 +183,16 @@ class HomePage extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(8.0),
         decoration: BoxDecoration(
-          color: Color(0xff44CEA8), // Green color
+          color: const Color(0xff44CEA8), // Green color
           borderRadius: BorderRadius.circular(12.0),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.3), // Shadow color with opacity
+              offset: const Offset(0, 4), // Shadow offset (x, y)
+              blurRadius: 8.0, // Shadow blur radius
+              spreadRadius: 0.0, // Shadow spread radius
+            ),
+          ],
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.start,
@@ -163,14 +203,14 @@ class HomePage extends StatelessWidget {
               children: [
                 Text(
                   title,
-                  style: TextStyle(
+                  style: const TextStyle(
                     color: Colors.black,
                     fontSize: 16.0,
                   ),
                 ),
                 Text(
                   amount,
-                  style: TextStyle(
+                  style: const TextStyle(
                     color: Colors.black,
                     fontSize: 14.0,
                   ),
@@ -178,7 +218,7 @@ class HomePage extends StatelessWidget {
               ],
             ),
             // Spacing between the text and the grey container
-            SizedBox(width: 10.0),
+            const SizedBox(width: 10.0),
             // Grey container taking up nearly the full width
             Expanded(
               child: Container(
@@ -190,8 +230,8 @@ class HomePage extends StatelessWidget {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: List.generate(6, (index) {
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 5.0),
+                    return const Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 5.0),
                       child: Text(
                         '0',
                         style: TextStyle(
