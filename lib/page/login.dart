@@ -146,21 +146,7 @@ class _LoginPageState extends State<LoginPage> {
                     vertical: 14.0), // เพิ่มระยะห่างภายในกล่องข้อความ
               ),
             ),
-            Align(
-              alignment: Alignment.centerRight,
-              child: TextButton(
-                onPressed: () {
-                  // Add your forget password logic here
-                },
-                child: const Text(
-                  'Forget password?',
-                  style: TextStyle(
-                    color: Color(0xFF471AA0),
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ),
+
             Center(
               child: Text(text),
             ),
