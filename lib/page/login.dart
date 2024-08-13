@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart'; // Import for TapGestureRecognizer
 import 'package:miniprojectapp/config/config.dart';
+import 'package:miniprojectapp/page/home.dart';
 import 'package:miniprojectapp/request/user_post_req.dart';
 import 'package:miniprojectapp/response/user_post_res.dart';
 import 'register.dart'; // Import your register page
@@ -201,25 +202,48 @@ class _LoginPageState extends State<LoginPage> {
 
   void login() async {
     var model = UserPostReq(
-        username: usernameController.text, password: passwordController.text);
+      username: usernameController.text,
+      password: passwordController.text,
+    );
+
     try {
-      var value = await http.post(Uri.parse("$url/users/login"),
-          headers: {"Content-Type": "application/json; charset=utf-8"},
-          //         //JsonEncode() = Covert Object to json string
-          //         // body : jsonEncode(data)
-          body: userPostReqToJson(model));
-      List<UserPostRes> users = userPostResFromJson(value.body);
-      log(users[0].uid.toString());
-      // Navigator.push(
-      //     context,
-      //     MaterialPageRoute(
-      //       builder: (context) => ShowtripPage(),
-      //     ));
+      var response = await http.post(
+        Uri.parse("$url/users/login"),
+        headers: {"Content-Type": "application/json; charset=utf-8"},
+        body: userPostReqToJson(model),
+      );
+
+      log('Response status: ${response.statusCode}');
+      log('Response body: ${response.body}');
+
+      if (response.statusCode >= 200 && response.statusCode < 300) {
+        // บันทึกว่าการตอบสนองเป็นรหัสสถานะที่แสดงว่ามีความสำเร็จ
+        List<UserPostRes> users = userPostResFromJson(response.body);
+
+        if (users.isNotEmpty) {
+          log(users[0].uid.toString());
+
+          // Navigate to HomePage on successful login
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const HomePage(),
+            ),
+          );
+        } else {
+          setState(() {
+            text = "No user data found";
+          });
+        }
+      } else {
+        setState(() {
+          text = "Username or Password Incorrect";
+        });
+      }
     } catch (err) {
       log(err.toString());
       setState(() {
-        log('ERROR');
-        text = "Username no or Password Incorrect";
+        text = "An error occurred. Please try again.";
       });
     }
   }
