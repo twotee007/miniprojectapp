@@ -64,10 +64,15 @@ flutter:
   assets:
     - assets/config/
     - assets/img/
+  
   fonts:
     - family: Revalia
       fonts:
         - asset: assets/font/Revalia-Regular.ttf
+    - family: RhodiumLibre
+      fonts:
+        - asset: assets/font/RhodiumLibre-Regular.ttf
+          
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

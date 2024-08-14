@@ -15,6 +15,8 @@ class _WalletPageState extends State<WalletPage> {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+
     return Scaffold(
       body: Stack(
         children: [
@@ -60,11 +62,143 @@ class _WalletPageState extends State<WalletPage> {
               ],
             ),
           ),
-          // Main Content
-          Center(
+          // Title Positioned Above the White Container
+          Positioned(
+            top: 60, // Adjust this value as needed
+            left: 30,
+            right: 20,
             child: Text(
-              'หน้า วอเรท/สลาก',
-              style: TextStyle(fontSize: 24, color: Colors.white),
+              'LOTTO168',
+              style: TextStyle(
+                fontSize: 24,
+                fontFamily: 'Revalia', // Use Revalia font
+                color: const Color.fromARGB(255, 255, 255, 255),
+              ),
+            ),
+          ),
+          // Main Content Box
+          Align(
+            alignment: Alignment.center,
+            child: Container(
+              margin: const EdgeInsets.only(
+                  top: 115,
+                  left: 20,
+                  right: 20,
+                  bottom: 20), // Adjust margin to ensure title is not covered
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: const Color.fromARGB(255, 255, 255, 255),
+                borderRadius: BorderRadius.circular(16.0),
+                boxShadow: const [
+                  BoxShadow(
+                    color: Colors.black26,
+                    blurRadius: 8.0,
+                  ),
+                ],
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // New Text Above the Wallet Information
+                  Text(
+                    'วอเลท & สลาก',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontFamily: 'RhodiumLibre',
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                    ),
+                  ),
+                  SizedBox(height: 20),
+                  // Wallet Information
+                  Container(
+                    width: screenWidth -
+                        40, // Adjust the width to fit within the margin
+                    padding: EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      color: Color(0xFF471AA0), // Dark purple background
+                      borderRadius: BorderRadius.circular(10),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.1),
+                          blurRadius: 10,
+                          offset: Offset(0, 5),
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'เงินคงเหลือ :',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontFamily: 'Revalia',
+                            fontWeight: FontWeight.normal,
+                            color: Colors.white,
+                          ),
+                        ),
+                        SizedBox(height: 10),
+                        Align(
+                          alignment: Alignment.center,
+                          child: Text(
+                            '4936 บาท',
+                            style: TextStyle(
+                              fontSize: 28,
+                              fontWeight: FontWeight.bold,
+                              fontFamily: 'Revalia',
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  SizedBox(height: 20),
+                  // Total Lottery Tickets
+                  Container(
+                    padding: EdgeInsets.symmetric(vertical: 10),
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      color: Color(0xFF32B967), // Green background
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Text(
+                      'สลากทั้งหมด : 3 ใบ',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontFamily: 'RhodiumLibre',
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 20),
+                  // Lottery Tickets List
+                  Expanded(
+                    child: ListView(
+                      padding:
+                          EdgeInsets.only(bottom: 100), // เพิ่ม padding ตรงนี้
+                      children: [
+                        _buildLotteryCard(
+                          '1 2 3 4 5 6',
+                          'คุณถูกรางวัลที่ 1 2000 บาท',
+                          true,
+                        ),
+                        _buildLotteryCard(
+                          '1 2 3 4 5 6',
+                          'น่าเสียดายคุณไม่ถูกรางวัล',
+                          false,
+                        ),
+                        _buildLotteryCard(
+                          '1 2 3 4 5 6',
+                          'น่าเสียดายคุณไม่ถูกรางวัล',
+                          false,
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
           // Bottom Navigation Bar
@@ -100,4 +234,174 @@ class _WalletPageState extends State<WalletPage> {
       ),
     );
   }
+
+  Widget _buildLotteryCard(String numbers, String result, bool isWinner) {
+    List<String> numberList = numbers.split(' '); // แยกตัวเลข
+
+    return Card(
+      margin: EdgeInsets.symmetric(vertical: 10),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(15),
+        side: BorderSide(
+          color: isWinner ? Color(0xFF0ED600) : Colors.red,
+          width: 2,
+        ),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(15.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // โลโก้ที่อยู่ด้านซ้ายและจัดตำแหน่งให้ตรงกลาง
+            Row(
+              children: [
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Image.asset(
+                    'assets/img/file.png', // Path to your logo
+                    width: 80, // Adjust the size as needed
+                    height: 80, // Adjust the size as needed
+                  ),
+                ),
+                SizedBox(width: 10),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Image.asset(
+                            'assets/img/Lotto.png',
+                            width: 30,
+                            height: 30,
+                          ),
+                          SizedBox(width: 10),
+                          Text(
+                            'สลาก LOTTO168',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontFamily: 'Revalia',
+                              color: Color(0xFF5B1B92),
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 10),
+                      // Numbers Row
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: numberList.map((number) {
+                          return Container(
+                            padding: EdgeInsets.all(8.0), // ลด padding
+                            decoration: BoxDecoration(
+                              border: Border.all(
+                                color: Color(0xFF471AA0), // สีกรอบ
+                                width: 1.5,
+                                 // ลดความหนาของ border
+                              ),
+                              borderRadius: BorderRadius.circular(4.0),
+                            ),
+                            child: Center(
+                              child: Text(
+                                number,
+                                style: TextStyle(
+                                  fontSize: 14, // ลดขนาดตัวเลข
+                                  fontWeight: FontWeight.bold,
+                                  color: Color(0xFF471AA0), // สีตัวเลข
+                                ),
+                              ),
+                            ),
+                          );
+                        }).toList(),
+                      ),
+                      SizedBox(height: 10),
+                      Text(
+                        result,
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: isWinner ? Color(0xFF0ED600) : Colors.red,
+                          fontFamily: 'Revalia',
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 10),
+            // ข้อความรับรางวัลที่สามารถกดได้
+            Visibility(
+              visible: isWinner,
+              child: InkWell(
+                onTap: () {
+                  _handlePrizeClaim(); // ฟังก์ชันจัดการการคลิกที่ข้อความ
+                },
+                child: Container(
+                  padding: EdgeInsets.symmetric(vertical: 10),
+                  alignment: Alignment.centerRight,
+                  child: Text(
+                    'คลิกที่สลากแล้วรับรางวัล',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontFamily: 'Revalia',
+                      color: Color(0xFF0ED600),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  
+
+  void _handlePrizeClaim() {
+    // ฟังก์ชันจัดการการคลิกที่ปุ่ม
+    // ทำบางสิ่งเมื่อคลิก เช่น แสดงข้อความ, อัปเดตสถานะ, หรืออื่น ๆ
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('รับรางวัล'),
+          content: Text('คุณได้คลิกเพื่อรับรางวัลแล้ว!'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('ตกลง'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+}
+
+
+
+void _handlePrizeClaim(dynamic context) {
+  // ฟังก์ชันจัดการการคลิกที่ปุ่ม
+  // ทำบางสิ่งเมื่อคลิก เช่น แสดงข้อความ, อัปเดตสถานะ, หรืออื่น ๆ
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: Text('รับรางวัล'),
+        content: Text('คุณได้คลิกเพื่อรับรางวัลแล้ว!'),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            child: Text('ตกลง'),
+          ),
+        ],
+      );
+    },
+  );
 }

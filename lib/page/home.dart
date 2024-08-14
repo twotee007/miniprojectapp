@@ -84,7 +84,7 @@ class _HomePage extends State<HomePage> {
               margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: const Color.fromARGB(255, 255, 255, 255),
                 borderRadius: BorderRadius.circular(16.0),
                 boxShadow: const [
                   BoxShadow(
