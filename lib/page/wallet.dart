@@ -109,12 +109,12 @@ class _WalletPageState extends State<WalletPage> {
                       color: Colors.black,
                     ),
                   ),
-                  SizedBox(height: 20),
+                  SizedBox(height: 10),
                   // Wallet Information
                   Container(
                     width: screenWidth -
                         40, // Adjust the width to fit within the margin
-                    padding: EdgeInsets.all(20),
+                    padding: EdgeInsets.all(15),
                     decoration: BoxDecoration(
                       color: Color(0xFF471AA0), // Dark purple background
                       borderRadius: BorderRadius.circular(10),
@@ -138,7 +138,7 @@ class _WalletPageState extends State<WalletPage> {
                             color: Colors.white,
                           ),
                         ),
-                        SizedBox(height: 10),
+                        SizedBox(height: 8),
                         Align(
                           alignment: Alignment.center,
                           child: Text(
@@ -154,7 +154,7 @@ class _WalletPageState extends State<WalletPage> {
                       ],
                     ),
                   ),
-                  SizedBox(height: 20),
+                  SizedBox(height: 10),
                   // Total Lottery Tickets
                   Container(
                     padding: EdgeInsets.symmetric(vertical: 10),
@@ -239,7 +239,7 @@ class _WalletPageState extends State<WalletPage> {
     List<String> numberList = numbers.split(' '); // แยกตัวเลข
 
     return Card(
-      margin: EdgeInsets.symmetric(vertical: 10),
+      margin: EdgeInsets.symmetric(vertical: 5),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(15),
         side: BorderSide(
@@ -248,7 +248,7 @@ class _WalletPageState extends State<WalletPage> {
         ),
       ),
       child: Padding(
-        padding: const EdgeInsets.all(15.0),
+        padding: const EdgeInsets.all(7.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -259,11 +259,11 @@ class _WalletPageState extends State<WalletPage> {
                   alignment: Alignment.centerLeft,
                   child: Image.asset(
                     'assets/img/file.png', // Path to your logo
-                    width: 80, // Adjust the size as needed
-                    height: 80, // Adjust the size as needed
+                    width: 75, // Adjust the size as needed
+                    height: 75, // Adjust the size as needed
                   ),
                 ),
-                SizedBox(width: 10),
+                SizedBox(width: 5),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -273,7 +273,7 @@ class _WalletPageState extends State<WalletPage> {
                         children: [
                           Image.asset(
                             'assets/img/Lotto.png',
-                            width: 30,
+                            width: 40,
                             height: 30,
                           ),
                           SizedBox(width: 10),
@@ -298,7 +298,7 @@ class _WalletPageState extends State<WalletPage> {
                               border: Border.all(
                                 color: Color(0xFF471AA0), // สีกรอบ
                                 width: 1.5,
-                                 // ลดความหนาของ border
+                                // ลดความหนาของ border
                               ),
                               borderRadius: BorderRadius.circular(4.0),
                             ),
@@ -357,8 +357,6 @@ class _WalletPageState extends State<WalletPage> {
     );
   }
 
-  
-
   void _handlePrizeClaim() {
     // ฟังก์ชันจัดการการคลิกที่ปุ่ม
     // ทำบางสิ่งเมื่อคลิก เช่น แสดงข้อความ, อัปเดตสถานะ, หรืออื่น ๆ
@@ -381,8 +379,6 @@ class _WalletPageState extends State<WalletPage> {
     );
   }
 }
-
-
 
 void _handlePrizeClaim(dynamic context) {
   // ฟังก์ชันจัดการการคลิกที่ปุ่ม
