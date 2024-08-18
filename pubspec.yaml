@@ -72,6 +72,9 @@ flutter:
     - family: RhodiumLibre
       fonts:
         - asset: assets/font/RhodiumLibre-Regular.ttf
+    - family: Inter
+      fonts:
+        - asset: assets/font/Inter_18pt-Black.ttf
           
 
   # An image asset can refer to one or more resolution-specific "variants", see

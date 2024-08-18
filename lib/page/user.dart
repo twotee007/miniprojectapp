@@ -64,11 +64,16 @@ class UserPage extends StatelessWidget {
                   // White Border Container
                   Container(
                     margin: EdgeInsets.only(top: 130.0), // เพิ่ม margin ด้านบน
-                    padding: EdgeInsets.only(top: 60.0, left: 16.0, right: 16.0, bottom: 16.0), // เพิ่ม padding ด้านบน
+                    padding: EdgeInsets.only(
+                        top: 60.0,
+                        left: 16.0,
+                        right: 16.0,
+                        bottom: 16.0), // เพิ่ม padding ด้านบน
                     decoration: BoxDecoration(
                       color: Colors.white, // สีพื้นหลังของกรอบ
                       borderRadius: BorderRadius.circular(20), // ขอบมนของกรอบ
-                      border: Border.all(color: Colors.white, width: 2), // กรอบสีขาว
+                      border: Border.all(
+                          color: Colors.white, width: 2), // กรอบสีขาว
                       boxShadow: [
                         BoxShadow(
                           color: Colors.black26,
@@ -79,7 +84,9 @@ class UserPage extends StatelessWidget {
                     ),
                     child: Column(
                       children: [
-                        SizedBox(height: 80), // เพิ่มที่ว่างด้านบนเพื่อให้รูปโปรไฟล์ต่ำลง
+                        SizedBox(
+                            height:
+                                80), // เพิ่มที่ว่างด้านบนเพื่อให้รูปโปรไฟล์ต่ำลง
                         _buildTextField(
                           icon: Icons.person_4_outlined,
                           label: 'คุณฮง',
@@ -87,7 +94,7 @@ class UserPage extends StatelessWidget {
                         SizedBox(height: 20),
                         _buildTextField(
                           icon: Icons.person_pin_outlined,
-                          label: 'อัครwา จรัส',
+                          label: 'อัครพล จรัส',
                         ),
                         SizedBox(height: 20),
                         _buildTextField(
@@ -95,18 +102,25 @@ class UserPage extends StatelessWidget {
                           label: 'akara****@gmail.com',
                         ),
                         SizedBox(height: 40),
+                        // ปรับขนาดปุ่ม Logout
                         ElevatedButton(
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Color(0xFFCC7B7B), // สีของปุ่ม Logout
-                            padding: EdgeInsets.symmetric(horizontal: 50, vertical: 15),
+                            backgroundColor:
+                                Color(0xFFCC7B7B), // สีของปุ่ม Logout
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 50, vertical: 15),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(10),
                             ),
+                            minimumSize: Size(double.infinity,
+                                50), // ขยายความกว้างของปุ่มให้เต็มขนาด
                           ),
                           onPressed: () {
                             Navigator.pushReplacement(
                               context,
-                              MaterialPageRoute(builder: (context) => LoginPage()), // นำทางไปยัง LoginPage
+                              MaterialPageRoute(
+                                  builder: (context) =>
+                                      LoginPage()), // นำทางไปยัง LoginPage
                             );
                           },
                           child: Text(
@@ -123,7 +137,8 @@ class UserPage extends StatelessWidget {
                   // Profile Picture
                   Positioned(
                     top: 60, // ปรับตำแหน่งรูปโปรไฟล์ให้ต่ำลง
-                    left: MediaQuery.of(context).size.width / 2 - 80, // จัดกลางแนวนอน
+                    left: MediaQuery.of(context).size.width / 2 -
+                        80, // จัดกลางแนวนอน
                     child: CircleAvatar(
                       radius: 60,
                       backgroundColor: Colors.blueAccent,
@@ -174,19 +189,20 @@ class UserPage extends StatelessWidget {
       readOnly: true, // ทำให้ไม่สามารถแก้ไขได้
       enabled: false, // ทำให้ไม่สามารถโต้ตอบได้
       decoration: InputDecoration(
-        prefixIcon: Icon(icon, color: Colors.purple),
+        prefixIcon: Icon(icon, color: Color(0xFF9747FF)),
         labelText: label,
-        labelStyle: TextStyle(color: Colors.purple),
+        labelStyle: TextStyle(color: Color(0xFF9747FF),
+        fontFamily: 'Inter'),
         border: OutlineInputBorder(
-          borderSide: BorderSide(color: Colors.purple),
+          borderSide: BorderSide(color: Color(0xFF9747FF)),
           borderRadius: BorderRadius.circular(10),
         ),
         focusedBorder: OutlineInputBorder(
-          borderSide: BorderSide(color: Colors.purple),
+          borderSide: BorderSide(color: Color(0xFF9747FF)),
           borderRadius: BorderRadius.circular(10),
         ),
         disabledBorder: OutlineInputBorder(
-          borderSide: BorderSide(color: Colors.purple),
+          borderSide: BorderSide(color: Color(0xFF9747FF)),
           borderRadius: BorderRadius.circular(10),
         ),
       ),
