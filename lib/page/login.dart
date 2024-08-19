@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart'; // Import for TapGestureRecognizer
 import 'package:miniprojectapp/config/config.dart';
+import 'package:miniprojectapp/page/admin.dart';
 import 'package:miniprojectapp/page/home.dart';
 import 'package:miniprojectapp/request/user_post_req.dart';
 import 'package:miniprojectapp/response/user_post_res.dart';
@@ -221,15 +222,23 @@ class _LoginPageState extends State<LoginPage> {
         List<UserPostRes> users = userPostResFromJson(response.body);
 
         if (users.isNotEmpty) {
-          log(users[0].uid.toString());
-
           // Navigate to HomePage on successful login
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (context) => const HomePage(),
-            ),
-          );
+          if (users[0].type == "user") {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const HomePage(),
+              ),
+            );
+          } else if (users[0].type == "admin") {
+            log(users[0].fullname);
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const AdminPage(),
+              ),
+            );
+          }
         } else {
           setState(() {
             text = "No user data found";

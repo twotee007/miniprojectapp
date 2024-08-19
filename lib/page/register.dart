@@ -387,7 +387,8 @@ class _registerPageState extends State<registerPage> {
           fullname: fullnameController.text,
           wallet: int.parse(addmoneyController.text), // Convert String to int
           email: emailController.text,
-          img: "");
+          img:
+              "https://w7.pngwing.com/pngs/178/595/png-transparent-user-profile-computer-icons-login-user-avatars-thumbnail.png");
       http
           .post(Uri.parse('$url/users/adduser'),
               headers: {"Content-Type": "application/json; charset=utf-8"},
