@@ -227,7 +227,9 @@ class _LoginPageState extends State<LoginPage> {
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(
-                builder: (context) => const HomePage(),
+                builder: (context) => HomePage(
+                  uid: users[0].uid,
+                ),
               ),
             );
           } else if (users[0].type == "admin") {

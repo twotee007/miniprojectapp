@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:ui'; // Import for the BackdropFilter
 import 'package:flutter/material.dart';
 import 'package:miniprojectapp/page/Widget.dart';
@@ -6,7 +7,8 @@ import 'package:miniprojectapp/page/user.dart';
 import 'package:miniprojectapp/page/wallet.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+  int uid = 0;
+  HomePage({super.key, required this.uid});
 
   @override
   _HomePage createState() => _HomePage();
@@ -14,6 +16,13 @@ class HomePage extends StatefulWidget {
 
 class _HomePage extends State<HomePage> {
   String activePage = 'home'; // State variable to track the active page
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    log(widget.uid.toString());
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -124,15 +133,15 @@ class _HomePage extends State<HomePage> {
                   MaterialPageRoute(builder: (context) {
                     switch (page) {
                       case 'home':
-                        return HomePage();
+                        return HomePage(uid: widget.uid);
                       case 'lotto':
-                        return LottoPage();
+                        return LottoPage(uid: widget.uid);
                       case 'wallet':
-                        return WalletPage();
+                        return WalletPage(uid: widget.uid);
                       case 'user':
-                        return UserPage();
+                        return UserPage(uid: widget.uid);
                       default:
-                        return HomePage();
+                        return HomePage(uid: widget.uid);
                     }
                   }),
                 );

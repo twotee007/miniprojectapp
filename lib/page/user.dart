@@ -7,6 +7,9 @@ import 'package:miniprojectapp/page/wallet.dart';
 import 'package:miniprojectapp/page/login.dart'; // นำเข้า LoginPage
 
 class UserPage extends StatelessWidget {
+  int uid = 0;
+  UserPage({super.key, required this.uid});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -164,15 +167,15 @@ class UserPage extends StatelessWidget {
                   MaterialPageRoute(builder: (context) {
                     switch (page) {
                       case 'home':
-                        return HomePage();
+                        return HomePage(uid: uid);
                       case 'lotto':
-                        return LottoPage();
+                        return LottoPage(uid: uid);
                       case 'wallet':
-                        return WalletPage();
+                        return WalletPage(uid: uid);
                       case 'user':
-                        return UserPage();
+                        return UserPage(uid: uid);
                       default:
-                        return HomePage();
+                        return HomePage(uid: uid);
                     }
                   }),
                 );
@@ -191,8 +194,7 @@ class UserPage extends StatelessWidget {
       decoration: InputDecoration(
         prefixIcon: Icon(icon, color: Color(0xFF9747FF)),
         labelText: label,
-        labelStyle: TextStyle(color: Color(0xFF9747FF),
-        fontFamily: 'Inter'),
+        labelStyle: TextStyle(color: Color(0xFF9747FF), fontFamily: 'Inter'),
         border: OutlineInputBorder(
           borderSide: BorderSide(color: Color(0xFF9747FF)),
           borderRadius: BorderRadius.circular(10),

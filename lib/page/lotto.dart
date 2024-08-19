@@ -1,17 +1,33 @@
+import 'dart:developer';
 import 'dart:ui'; // Import for BackdropFilter
 import 'package:flutter/material.dart';
+import 'package:miniprojectapp/config/config.dart';
 import 'package:miniprojectapp/page/Widget.dart';
 import 'package:miniprojectapp/page/home.dart';
 import 'package:miniprojectapp/page/user.dart';
 import 'package:miniprojectapp/page/wallet.dart';
+import 'package:http/http.dart' as http;
+import 'package:miniprojectapp/response/lotto_get_res.dart';
 
 class LottoPage extends StatefulWidget {
+  int uid = 0;
+  LottoPage({super.key, required this.uid});
   @override
   _LottoPurchasePageState createState() => _LottoPurchasePageState();
 }
 
 class _LottoPurchasePageState extends State<LottoPage> {
   String activePage = 'lotto'; // Track the active page
+  List<LottoGetRes> lottoGetRes = [];
+  late Future<void> loadData;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    log(widget.uid.toString());
+    loadData = loadDataAstnc();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -264,17 +280,25 @@ class _LottoPurchasePageState extends State<LottoPage> {
                   SizedBox(height: 10),
                   // Display the selected Lotto numbers and purchase options
                   Expanded(
-                    child: ListView(
-                      padding: EdgeInsets.only(bottom: 100),
-                      children: [
-                        _buildLotteryCard('1 2 3 4 5 6', 100),
-                        _buildLotteryCard('1 2 3 4 5 6', 100),
-                        _buildLotteryCard('1 2 3 4 5 6', 100),
-                        _buildLotteryCard('1 2 3 4 5 6', 100),
-                        _buildLotteryCard('1 2 3 4 5 6', 100),
-                        _buildLotteryCard('1 2 3 4 5 6', 100),
-                      ],
-                    ),
+                    child: FutureBuilder(
+                        future: loadData,
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState !=
+                              ConnectionState.done) {
+                            return const Center(
+                              child: CircularProgressIndicator(),
+                            );
+                          }
+                          return ListView(
+                            padding: EdgeInsets.only(bottom: 100),
+                            children: lottoGetRes
+                                .map(
+                                  (lotto) => _buildLotteryCard(
+                                      _formatNumber(lotto.number), lotto.price),
+                                )
+                                .toList(),
+                          );
+                        }),
                   ),
                 ],
               ),
@@ -296,15 +320,15 @@ class _LottoPurchasePageState extends State<LottoPage> {
                   MaterialPageRoute(builder: (context) {
                     switch (page) {
                       case 'home':
-                        return HomePage();
+                        return HomePage(uid: widget.uid);
                       case 'lotto':
-                        return LottoPage();
+                        return LottoPage(uid: widget.uid);
                       case 'wallet':
-                        return WalletPage();
+                        return WalletPage(uid: widget.uid);
                       case 'user':
-                        return UserPage();
+                        return UserPage(uid: widget.uid);
                       default:
-                        return HomePage();
+                        return HomePage(uid: widget.uid);
                     }
                   }),
                 );
@@ -314,6 +338,10 @@ class _LottoPurchasePageState extends State<LottoPage> {
         ],
       ),
     );
+  }
+
+  String _formatNumber(String number) {
+    return number.split('').join(' ');
   }
 
   Widget _buildLotteryCard(String numbers, int price) {
@@ -454,4 +482,15 @@ class _LottoPurchasePageState extends State<LottoPage> {
       ),
     );
   }
+
+  Future<void> loadDataAstnc() async {
+    // await Future.delayed(const Duration(seconds: 2), () => print("BBB"));
+    var value = await Configuration.getConfig();
+    String url = value['apiEndPoint'];
+
+    var json = await http.get(Uri.parse('$url/lotto'));
+    lottoGetRes = lottoGetResFromJson(json.body);
+  }
+
+  void getlotto() {}
 }

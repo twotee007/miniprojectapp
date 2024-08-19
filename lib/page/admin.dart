@@ -138,7 +138,7 @@ class _AdminPage extends State<AdminPage> {
         mainAxisSize: MainAxisSize.min,
         children: [
           Container(
-            width: 300,        
+            width: 300,
             decoration: BoxDecoration(
               border:
                   isActive ? Border.all(color: Colors.red, width: 2.0) : null,
