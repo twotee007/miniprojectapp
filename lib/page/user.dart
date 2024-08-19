@@ -1,14 +1,38 @@
-import 'dart:ui'; // Import for BackdropFilter
+import 'dart:developer';
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
+import 'package:miniprojectapp/config/config.dart';
 import 'package:miniprojectapp/page/Widget.dart';
 import 'package:miniprojectapp/page/home.dart';
+import 'package:miniprojectapp/page/login.dart';
 import 'package:miniprojectapp/page/lotto.dart';
 import 'package:miniprojectapp/page/wallet.dart';
-import 'package:miniprojectapp/page/login.dart'; // นำเข้า LoginPage
+import 'package:http/http.dart' as http;
+import 'package:miniprojectapp/response/useruid_get_res.dart';
 
-class UserPage extends StatelessWidget {
+class UserPage extends StatefulWidget {
   int uid = 0;
   UserPage({super.key, required this.uid});
+
+  @override
+  State<UserPage> createState() => _UserPageState();
+}
+
+class _UserPageState extends State<UserPage> {
+  String activePage = 'user'; // Track the active page
+  List<UseruidGetRes> usergetRes = [];
+  late Future<void> loadData;
+  TextEditingController usernameCtl = TextEditingController();
+  TextEditingController fullnameCtl = TextEditingController();
+  TextEditingController emailCtl = TextEditingController();
+  @override
+  void initState() {
+    // TODO: implement initState
+    log(widget.uid.toString());
+    super.initState();
+    loadData = loadDataAstnc();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -85,57 +109,70 @@ class UserPage extends StatelessWidget {
                         ),
                       ],
                     ),
-                    child: Column(
-                      children: [
-                        SizedBox(
-                            height:
-                                80), // เพิ่มที่ว่างด้านบนเพื่อให้รูปโปรไฟล์ต่ำลง
-                        _buildTextField(
-                          icon: Icons.person_4_outlined,
-                          label: 'คุณฮง',
-                        ),
-                        SizedBox(height: 20),
-                        _buildTextField(
-                          icon: Icons.person_pin_outlined,
-                          label: 'อัครพล จรัส',
-                        ),
-                        SizedBox(height: 20),
-                        _buildTextField(
-                          icon: Icons.email_outlined,
-                          label: 'akara****@gmail.com',
-                        ),
-                        SizedBox(height: 40),
-                        // ปรับขนาดปุ่ม Logout
-                        ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor:
-                                Color(0xFFCC7B7B), // สีของปุ่ม Logout
-                            padding: EdgeInsets.symmetric(
-                                horizontal: 50, vertical: 15),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            minimumSize: Size(double.infinity,
-                                50), // ขยายความกว้างของปุ่มให้เต็มขนาด
-                          ),
-                          onPressed: () {
-                            Navigator.pushReplacement(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) =>
-                                      LoginPage()), // นำทางไปยัง LoginPage
+                    child: FutureBuilder(
+                        future: loadData,
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState !=
+                              ConnectionState.done) {
+                            return const Center(
+                              child: CircularProgressIndicator(),
                             );
-                          },
-                          child: Text(
-                            'Logout',
-                            style: TextStyle(
-                              fontSize: 16,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
+                          }
+                          fullnameCtl.text = usergetRes[0].fullname;
+                          usernameCtl.text = usergetRes[0].username;
+                          emailCtl.text = usergetRes[0].email;
+                          return Column(
+                            children: [
+                              SizedBox(
+                                  height:
+                                      80), // เพิ่มที่ว่างด้านบนเพื่อให้รูปโปรไฟล์ต่ำลง
+                              _buildTextField(
+                                icon: Icons.person_4_outlined,
+                                label: usernameCtl.text,
+                              ),
+                              SizedBox(height: 20),
+                              _buildTextField(
+                                icon: Icons.person_pin_outlined,
+                                label: fullnameCtl.text,
+                              ),
+                              SizedBox(height: 20),
+                              _buildTextField(
+                                icon: Icons.email_outlined,
+                                label: emailCtl.text,
+                              ),
+                              SizedBox(height: 40),
+                              // ปรับขนาดปุ่ม Logout
+                              ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor:
+                                      Color(0xFFCC7B7B), // สีของปุ่ม Logout
+                                  padding: EdgeInsets.symmetric(
+                                      horizontal: 50, vertical: 15),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  minimumSize: Size(double.infinity,
+                                      50), // ขยายความกว้างของปุ่มให้เต็มขนาด
+                                ),
+                                onPressed: () {
+                                  Navigator.pushReplacement(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            LoginPage()), // นำทางไปยัง LoginPage
+                                  );
+                                },
+                                child: Text(
+                                  'Logout',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          );
+                        }),
                   ),
                   // Profile Picture
                   Positioned(
@@ -167,15 +204,15 @@ class UserPage extends StatelessWidget {
                   MaterialPageRoute(builder: (context) {
                     switch (page) {
                       case 'home':
-                        return HomePage(uid: uid);
+                        return HomePage(uid: widget.uid);
                       case 'lotto':
-                        return LottoPage(uid: uid);
+                        return LottoPage(uid: widget.uid);
                       case 'wallet':
-                        return WalletPage(uid: uid);
+                        return WalletPage(uid: widget.uid);
                       case 'user':
-                        return UserPage(uid: uid);
+                        return UserPage(uid: widget.uid);
                       default:
-                        return HomePage(uid: uid);
+                        return HomePage(uid: widget.uid);
                     }
                   }),
                 );
@@ -209,5 +246,14 @@ class UserPage extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  Future<void> loadDataAstnc() async {
+    // await Future.delayed(const Duration(seconds: 2), () => print("BBB"));
+    var value = await Configuration.getConfig();
+    String url = value['apiEndPoint'];
+
+    var json = await http.get(Uri.parse('$url/users/${widget.uid}'));
+    usergetRes = useruidGetResFromJson(json.body);
   }
 }
