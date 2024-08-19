@@ -112,20 +112,25 @@ class _AdminPage extends State<AdminPage> {
           // Bottom Navigation Bar
           Align(
             alignment: Alignment.bottomCenter,
-            child: Text(
-              'ออกจากระบบ',
-              style: TextStyle(
-                fontSize: 16,
-                color: Colors.white
+            child: Container(
+              color: const Color(0xFF735DB8), // Light purple
+              padding: const EdgeInsets.symmetric(vertical: 7),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  _buildNavItem(
+                    'ออกจากระบบ',
+                  ),
+                ],
               ),
-              ),
+            ),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildNavItem(String assetPath, String label,
+  Widget _buildNavItem(String label,
       {bool isActive = false, VoidCallback? onPressed}) {
     return GestureDetector(
       onTap: onPressed,
@@ -133,24 +138,19 @@ class _AdminPage extends State<AdminPage> {
         mainAxisSize: MainAxisSize.min,
         children: [
           Container(
+            width: 300,        
             decoration: BoxDecoration(
               border:
                   isActive ? Border.all(color: Colors.red, width: 2.0) : null,
               borderRadius: BorderRadius.circular(8.0),
             ),
-            child: Image.asset(
-              assetPath,
-              color: Colors.white,
-              width: 60, // Adjust width as needed
-              height: 30, // Adjust height as needed
-            ),
           ),
           const SizedBox(height: 4), // Spacing between icon and text
           Text(
             label,
-            style: TextStyle(
+            style: const TextStyle(
               color: Colors.white,
-              fontSize: 15, // Adjust font size as needed
+              fontSize: 16, // Adjust font size as needed
             ),
           ),
         ],
