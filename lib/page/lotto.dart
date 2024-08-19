@@ -333,6 +333,7 @@ class _LottoPurchasePageState extends State<LottoPage> {
                   }),
                 );
               },
+              onItemTapped: (index) {},
             ),
           ),
         ],

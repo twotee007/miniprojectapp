@@ -8,6 +8,7 @@ class BottomNavBar extends StatelessWidget {
     Key? key,
     required this.activePage,
     required this.onNavItemTapped,
+    required Null Function(dynamic index) onItemTapped,
   }) : super(key: key);
 
   @override

@@ -146,6 +146,7 @@ class _HomePage extends State<HomePage> {
                   }),
                 );
               },
+              onItemTapped: (index) {},
             ),
           ),
         ],

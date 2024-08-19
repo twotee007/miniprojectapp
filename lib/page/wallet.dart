@@ -239,6 +239,7 @@ class _WalletPageState extends State<WalletPage> {
                   }),
                 );
               },
+              onItemTapped: (index) {},
             ),
           ),
         ],
