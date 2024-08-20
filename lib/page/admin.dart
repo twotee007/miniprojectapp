@@ -121,7 +121,7 @@ class _AdminPage extends State<AdminPage> {
   Widget _buildPrizeAnnouncement() {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 40),
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(20.0),
@@ -135,16 +135,17 @@ class _AdminPage extends State<AdminPage> {
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
+        
         children: [
           const Text(
             'ออกรางวัล',
             style: TextStyle(
               fontFamily: 'Revalia',
               fontSize: 28.0,
-              fontWeight: FontWeight.bold,
+              // fontWeight: FontWeight.bold,
             ),
           ),
-          const SizedBox(height: 24.0),
+          const SizedBox(height: 5.0),
           _buildPrizeRow('รางวัลที่ 1', '2000 บาท'),
           _buildPrizeRow('รางวัลที่ 2', '1500 บาท'),
           _buildPrizeRow('รางวัลที่ 3', '1000 บาท'),
@@ -158,7 +159,7 @@ class _AdminPage extends State<AdminPage> {
               style: ElevatedButton.styleFrom(
                 backgroundColor: Color(0xff44CEA8), // สีพื้นหลังของปุ่ม
                 foregroundColor: Colors.black, // สีของข้อความและไอคอน
-                padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                padding: EdgeInsets.symmetric(horizontal: 10, vertical: 6),
               ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
@@ -166,7 +167,7 @@ class _AdminPage extends State<AdminPage> {
                   Image.asset(
                     'assets/img/randomIcon.png', // แทนที่ด้วยพาธของรูปภาพของคุณ
                     width: 40,
-                    height: 40,
+                    height: 35,
                   ),
                   SizedBox(width: 10), // ระยะห่างระหว่างรูปภาพกับข้อความ
                   Text('สุ่มออกรางวัล'),
@@ -176,7 +177,12 @@ class _AdminPage extends State<AdminPage> {
       ),
     );
   }
+  //add reset system
 
+
+
+
+  
   // 3. แถบนำทางด้านล่าง
   Widget _buildBottomNavigationBar() {
     return Align(
@@ -225,6 +231,7 @@ class _AdminPage extends State<AdminPage> {
             style: TextStyle(
               fontSize: 14.0,
               fontWeight: FontWeight.bold,
+              fontFamily: 'Revalia'
             ),
           ),
           SizedBox(height: 4),
@@ -232,6 +239,7 @@ class _AdminPage extends State<AdminPage> {
             value,
             style: TextStyle(
               fontSize: 16.0,
+              fontFamily: 'Revalia'
             ),
           ),
         ],
