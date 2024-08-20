@@ -89,7 +89,12 @@ class _LottoPurchasePageState extends State<LottoPage> {
           // or automatically revert to showing all results after some time
           Future.delayed(Duration(seconds: 3), () {
             setState(() {
-              loadData = loadDataAstnc(); // Re-fetch data to reset the view
+              // Clear input fields
+              for (var controller in controllers) {
+                controller.clear();
+              }
+              // Re-fetch data to reset the view
+              loadData = loadDataAstnc();
               searchMessage = 'ทั้งหมด'; // Reset message
             });
           });
