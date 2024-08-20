@@ -14,19 +14,88 @@ class LottoPage extends StatefulWidget {
   LottoPage({super.key, required this.uid});
   @override
   _LottoPurchasePageState createState() => _LottoPurchasePageState();
+  List<TextEditingController> controllers =
+      List.generate(6, (_) => TextEditingController());
 }
 
 class _LottoPurchasePageState extends State<LottoPage> {
   String activePage = 'lotto'; // Track the active page
   List<LottoGetRes> lottoGetRes = [];
   late Future<void> loadData;
+  String searchMessage = 'ทั้งหมด';
+
+  // Add TextEditingController for each input field
+  final List<TextEditingController> controllers =
+      List.generate(6, (index) => TextEditingController());
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     log(widget.uid.toString());
     loadData = loadDataAstnc();
+    searchMessage = 'ทั้งหมด';
+    for (var controller in controllers) {
+      controller.addListener(() {
+        searchLotto();
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    // Dispose controllers when the widget is disposed
+    for (var controller in controllers) {
+      controller.dispose();
+    }
+    super.dispose();
+  }
+
+  // Search logic based on the input numbers
+  void searchLotto() {
+    setState(() {
+      // Collect input digits from the controllers
+      List<String> inputDigits = controllers.map((e) => e.text).toList();
+
+      // Check if all input fields are empty
+      if (inputDigits.every((digit) => digit.isEmpty)) {
+        // Reset to show all lotto results
+        loadData = loadDataAstnc();
+        searchMessage = 'ทั้งหมด'; // Reset message
+        lottoGetRes = []; // Clear previous search results
+      } else {
+        // Generate the search pattern with asterisks
+        searchMessage = 'ผลลัพธ์เลขที่ต้องการ=> ' +
+            inputDigits.map((digit) => digit.isEmpty ? '*' : digit).join(' ');
+
+        // Filter lotto results based on input digits
+        lottoGetRes = lottoGetRes.where((lotto) {
+          String formattedNumber = lotto.number;
+
+          // Check if the formatted number matches the input digits at specific positions
+          for (int i = 0; i < inputDigits.length; i++) {
+            if (inputDigits[i].isNotEmpty &&
+                (formattedNumber.length <= i ||
+                    formattedNumber[i] != inputDigits[i])) {
+              return false; // Exclude if not matching
+            }
+          }
+          return true; // Include if matching
+        }).toList();
+
+        // Update the search message if no results are found
+        if (lottoGetRes.isEmpty) {
+          searchMessage = 'ไม่พบเลขที่ท่านต้องการ';
+          // You might want to provide an option to refresh or retry the search
+          // or automatically revert to showing all results after some time
+          Future.delayed(Duration(seconds: 3), () {
+            setState(() {
+              loadData = loadDataAstnc(); // Re-fetch data to reset the view
+              searchMessage = 'ทั้งหมด'; // Reset message
+            });
+          });
+        }
+      }
+    });
   }
 
   @override
@@ -121,15 +190,13 @@ class _LottoPurchasePageState extends State<LottoPage> {
               ),
             ),
           ),
-          // Main Content Box
+          // Background and other UI elements...
+
           Align(
             alignment: Alignment.center,
             child: Container(
               margin: const EdgeInsets.only(
-                  top: 100, // Adjusted to account for the pink bar height
-                  left: 20,
-                  right: 20,
-                  bottom: 70), // Adjust margin to ensure title is not covered
+                  top: 100, left: 20, right: 20, bottom: 70),
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
                 color: const Color.fromARGB(255, 255, 255, 255),
@@ -144,7 +211,6 @@ class _LottoPurchasePageState extends State<LottoPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // New Text Above the Lotto Purchase Section
                   Text(
                     'ค้นหาเลขเด็ด!',
                     style: TextStyle(
@@ -155,12 +221,11 @@ class _LottoPurchasePageState extends State<LottoPage> {
                     ),
                   ),
                   SizedBox(height: 10),
-                  // Lotto Number Search
                   Container(
                     width: screenWidth - 40,
-                    padding: EdgeInsets.all(20), // Padding for the container
+                    padding: EdgeInsets.all(20),
                     decoration: BoxDecoration(
-                      color: Color(0xFF735DB8), // Dark purple background
+                      color: Color(0xFF735DB8),
                       borderRadius: BorderRadius.circular(10),
                       boxShadow: [
                         BoxShadow(
@@ -183,7 +248,6 @@ class _LottoPurchasePageState extends State<LottoPage> {
                           ),
                         ),
                         SizedBox(height: 20),
-                        // Number Input Section
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: List.generate(6, (index) {
@@ -198,32 +262,43 @@ class _LottoPurchasePageState extends State<LottoPage> {
                                 borderRadius: BorderRadius.circular(5),
                                 color: Colors.grey[300],
                               ),
-                              child: Center(
-                                child: Text(
-                                  '9',
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    fontFamily: 'Revalia',
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.black.withOpacity(
-                                        0.6), // Lighter black color
-                                  ),
+                              child: TextField(
+                                controller: controllers[index],
+                                textAlign: TextAlign.center,
+                                keyboardType: TextInputType.number,
+                                maxLength: 1,
+                                decoration: InputDecoration(
+                                  border: InputBorder.none,
+                                  counterText: "",
+                                ),
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontFamily: 'Revalia',
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black.withOpacity(0.6),
                                 ),
                               ),
                             );
                           }),
                         ),
-                        SizedBox(
-                            height:
-                                20), // Adjusted space between number input and buttons
-                        // Lotto Purchase Buttons arranged horizontally
+                        SizedBox(height: 20),
                         Row(
                           children: [
                             Expanded(
-                              flex: 1, // Short button
+                              flex: 1,
                               child: ElevatedButton(
                                 onPressed: () {
-                                  // Action for clear button
+                                  // Clear all input fields
+                                  for (var controller in controllers) {
+                                    controller.clear();
+                                  }
+
+                                  // Reset the search message and show all results
+                                  setState(() {
+                                    searchMessage = 'ทั้งหมด'; // Reset message
+                                    loadData =
+                                        loadDataAstnc(); // Reset results to show all data
+                                  });
                                 },
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: Color(0xFF744CEA8),
@@ -239,12 +314,13 @@ class _LottoPurchasePageState extends State<LottoPage> {
                                 ),
                               ),
                             ),
-                            SizedBox(width: 10), // Spacing between buttons
+                            SizedBox(width: 10),
                             Expanded(
-                              flex: 2, // Long button
+                              flex: 2,
                               child: ElevatedButton(
                                 onPressed: () {
-                                  // Action for search button
+                                  // Trigger the search
+                                  searchLotto();
                                 },
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: Color(0xFF44CEA8),
@@ -269,7 +345,7 @@ class _LottoPurchasePageState extends State<LottoPage> {
                   SizedBox(height: 20),
                   // Display all available lotto options
                   Text(
-                    'ทั้งหมด',
+                    searchMessage,
                     style: TextStyle(
                       fontSize: 20,
                       fontFamily: 'RhodiumLibre',
@@ -346,7 +422,7 @@ class _LottoPurchasePageState extends State<LottoPage> {
   }
 
   Widget _buildLotteryCard(String numbers, int price) {
-    List<String> numberList = numbers.split(' '); // Split numbers
+    List<String> numberList = numbers.split(' ');
 
     return Card(
       margin: EdgeInsets.symmetric(vertical: 7),
@@ -362,13 +438,12 @@ class _LottoPurchasePageState extends State<LottoPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Logo on the left and aligned to the center vertically
             Row(
               children: [
                 Image.asset(
-                  'assets/img/file.png', // Path to your logo
-                  width: 75, // Adjust the size as needed
-                  height: 75, // Adjust the size as needed
+                  'assets/img/file.png',
+                  width: 75,
+                  height: 75,
                 ),
                 SizedBox(width: 5),
                 Expanded(
@@ -379,7 +454,7 @@ class _LottoPurchasePageState extends State<LottoPage> {
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
                           Image.asset(
-                            'assets/img/Lotto.png', // Replace with your image
+                            'assets/img/Lotto.png',
                             width: 40,
                             height: 30,
                           ),
@@ -395,12 +470,11 @@ class _LottoPurchasePageState extends State<LottoPage> {
                         ],
                       ),
                       SizedBox(height: 10),
-                      // Numbers Row
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: numberList.map((number) {
                           return Container(
-                            padding: EdgeInsets.all(8.0), // Adjust padding
+                            padding: EdgeInsets.all(8.0),
                             decoration: BoxDecoration(
                               border: Border.all(
                                 color: Color(0xFF471AA0), // Border color
