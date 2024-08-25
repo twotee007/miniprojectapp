@@ -86,6 +86,7 @@ class _AdminPage extends State<AdminPage> {
           _buildHeader(),
           _buildStatistics(),
           _buildPrizeAnnouncement(),
+          _buildResetButton()
         ],
       ),
     );
@@ -135,7 +136,6 @@ class _AdminPage extends State<AdminPage> {
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
-        
         children: [
           const Text(
             'ออกรางวัล',
@@ -179,10 +179,31 @@ class _AdminPage extends State<AdminPage> {
   }
   //add reset system
 
+  Widget _buildResetButton() {
+    return Center(
+      child: ElevatedButton(
+        onPressed: () {},
+        style: ElevatedButton.styleFrom(
+          backgroundColor: const Color(0xff44CEA8), // สีพื้นหลังของปุ่ม
+          foregroundColor: Colors.white, // สีของข้อความและไอคอน
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Image.asset(
+              'assets/img/reset.png',
+              width: 40,
+              height: 35,
+            ),
+            const SizedBox(width: 10),
+            const Text("รีเซ็ตระบบใหม่"),
+          ],
+        ),
+      ),
+    );
+  }
 
-
-
-  
   // 3. แถบนำทางด้านล่าง
   Widget _buildBottomNavigationBar() {
     return Align(
@@ -229,18 +250,14 @@ class _AdminPage extends State<AdminPage> {
           Text(
             label,
             style: TextStyle(
-              fontSize: 14.0,
-              fontWeight: FontWeight.bold,
-              fontFamily: 'Revalia'
-            ),
+                fontSize: 14.0,
+                fontWeight: FontWeight.bold,
+                fontFamily: 'Revalia'),
           ),
           SizedBox(height: 4),
           Text(
             value,
-            style: TextStyle(
-              fontSize: 16.0,
-              fontFamily: 'Revalia'
-            ),
+            style: TextStyle(fontSize: 16.0, fontFamily: 'Revalia'),
           ),
         ],
       ),
