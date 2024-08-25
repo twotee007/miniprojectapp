@@ -94,7 +94,7 @@ class _AdminPage extends State<AdminPage> {
 
   Widget _buildHeader() {
     return const Padding(
-      padding: EdgeInsets.only(top: 60, left: 30),
+      padding: EdgeInsets.only(top: 30, left: 30),
       child: Text(
         'ADMIN\nLOTTO168',
         style: TextStyle(
@@ -121,7 +121,7 @@ class _AdminPage extends State<AdminPage> {
 
   Widget _buildPrizeAnnouncement() {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 40),
+      margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
       padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -184,7 +184,7 @@ class _AdminPage extends State<AdminPage> {
       child: ElevatedButton(
         onPressed: () {},
         style: ElevatedButton.styleFrom(
-          backgroundColor: const Color(0xff44CEA8), // สีพื้นหลังของปุ่ม
+          backgroundColor: const Color.fromARGB(255, 193, 126, 126), // สีพื้นหลังของปุ่ม
           foregroundColor: Colors.white, // สีของข้อความและไอคอน
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
         ),
