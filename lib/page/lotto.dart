@@ -8,6 +8,7 @@ import 'package:miniprojectapp/page/user.dart';
 import 'package:miniprojectapp/page/wallet.dart';
 import 'package:http/http.dart' as http;
 import 'package:miniprojectapp/response/lotto_get_res.dart';
+import 'package:miniprojectapp/response/useruid_get_res.dart';
 
 class LottoPage extends StatefulWidget {
   int uid = 0;
@@ -21,8 +22,10 @@ class LottoPage extends StatefulWidget {
 class _LottoPurchasePageState extends State<LottoPage> {
   String activePage = 'lotto'; // Track the active page
   List<LottoGetRes> lottoGetRes = [];
+  List<UseruidGetRes> usergetRes = [];
   late Future<void> loadData;
   String searchMessage = 'ทั้งหมด';
+  TextEditingController walletctl = TextEditingController();
 
   // Add TextEditingController for each input field
   final List<TextEditingController> controllers =
@@ -180,15 +183,26 @@ class _LottoPurchasePageState extends State<LottoPage> {
                         height: 35,
                       ),
                       SizedBox(width: 0),
-                      Text(
-                        ':12345฿', // Replace with the dynamic amount
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontFamily: 'Revalia',
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      ),
+                      FutureBuilder(
+                          future: loadData,
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState !=
+                                ConnectionState.done) {
+                              return const Center(
+                                child: CircularProgressIndicator(),
+                              );
+                            }
+                            walletctl.text = usergetRes[0].wallet.toString();
+                            return Text(
+                              ':${walletctl.text.isNotEmpty ? walletctl.text : '0'}฿',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontFamily: 'Revalia',
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            );
+                          }),
                     ],
                   ),
                 ],
@@ -570,6 +584,9 @@ class _LottoPurchasePageState extends State<LottoPage> {
 
     var json = await http.get(Uri.parse('$url/lotto'));
     lottoGetRes = lottoGetResFromJson(json.body);
+
+    var jsonuser = await http.get(Uri.parse('$url/users/${widget.uid}'));
+    usergetRes = useruidGetResFromJson(jsonuser.body);
   }
 
   void getlotto() {}

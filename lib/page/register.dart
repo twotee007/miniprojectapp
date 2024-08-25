@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:miniprojectapp/config/config.dart';
 import 'package:miniprojectapp/page/login.dart';
 import 'package:miniprojectapp/request/register_post_req.dart';
@@ -235,6 +236,10 @@ class _registerPageState extends State<registerPage> {
                         horizontal: 16.0,
                         vertical: 14.0), // เพิ่มระยะห่างภายในกล่องข้อความ
                   ),
+                  inputFormatters: [
+                    LengthLimitingTextInputFormatter(
+                        6), // กำหนดให้ใส่ได้ไม่เกิน 6 ตัวอักษร
+                  ],
                 ),
 
                 const SizedBox(
