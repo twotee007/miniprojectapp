@@ -39,7 +39,7 @@ class _LottoPurchasePageState extends State<LottoPage> {
     searchMessage = 'ทั้งหมด';
     for (var controller in controllers) {
       controller.addListener(() {
-        searchLotto();
+        // searchLotto();
       });
     }
   }
@@ -64,14 +64,14 @@ class _LottoPurchasePageState extends State<LottoPage> {
         // Reset to show all lotto results
         loadData = loadDataAstnc();
         searchMessage = 'ทั้งหมด'; // Reset message
-        lottoGetRes = []; // Clear previous search results
+        // Clear previous search results
       } else {
         // Generate the search pattern with asterisks
         searchMessage = 'ผลลัพธ์เลขที่ต้องการ=> ' +
             inputDigits.map((digit) => digit.isEmpty ? '*' : digit).join(' ');
 
         // Filter lotto results based on input digits
-        lottoGetRes = lottoGetRes.where((lotto) {
+        var filteredResults = lottoGetRes.where((lotto) {
           String formattedNumber = lotto.number;
 
           // Check if the formatted number matches the input digits at specific positions
@@ -85,22 +85,15 @@ class _LottoPurchasePageState extends State<LottoPage> {
           return true; // Include if matching
         }).toList();
 
-        // Update the search message if no results are found
-        if (lottoGetRes.isEmpty) {
+        // Update the lottoGetRes with filtered results
+        if (filteredResults.isEmpty) {
+          // If no results, notify the user and reset data for continuous search
           searchMessage = 'ไม่พบเลขที่ท่านต้องการ';
-          // You might want to provide an option to refresh or retry the search
-          // or automatically revert to showing all results after some time
-          Future.delayed(Duration(seconds: 3), () {
-            setState(() {
-              // Clear input fields
-              for (var controller in controllers) {
-                controller.clear();
-              }
-              // Re-fetch data to reset the view
-              loadData = loadDataAstnc();
-              searchMessage = 'ทั้งหมด'; // Reset message
-            });
-          });
+          loadData = loadDataAstnc(); // Reload all data
+        } else {
+          lottoGetRes = filteredResults;
+
+          // Update the lottoGetRes with the filtered results
         }
       }
     });
