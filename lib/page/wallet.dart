@@ -1,10 +1,13 @@
 import 'dart:developer';
 import 'dart:ui'; // Import for BackdropFilter
 import 'package:flutter/material.dart';
+import 'package:miniprojectapp/config/config.dart';
 import 'package:miniprojectapp/page/Widget.dart';
 import 'package:miniprojectapp/page/home.dart';
 import 'package:miniprojectapp/page/lotto.dart';
 import 'package:miniprojectapp/page/user.dart';
+import 'package:http/http.dart' as http;
+import 'package:miniprojectapp/response/useruid_get_res.dart';
 
 class WalletPage extends StatefulWidget {
   int uid = 0;
@@ -16,12 +19,15 @@ class WalletPage extends StatefulWidget {
 
 class _WalletPageState extends State<WalletPage> {
   String activePage = 'wallet'; // Track the active page
-
+  List<UseruidGetRes> usergetRes = [];
+  TextEditingController walletCtl = TextEditingController();
+  late Future<void> loadData;
   @override
   void initState() {
     // TODO: implement initState
     log(widget.uid.toString());
     super.initState();
+    loadData = loadDataAstnc();
   }
 
   @override
@@ -152,15 +158,27 @@ class _WalletPageState extends State<WalletPage> {
                         SizedBox(height: 8),
                         Align(
                           alignment: Alignment.center,
-                          child: Text(
-                            '4936 บาท',
-                            style: TextStyle(
-                              fontSize: 28,
-                              fontWeight: FontWeight.bold,
-                              fontFamily: 'Revalia',
-                              color: Colors.white,
-                            ),
-                          ),
+                          child: FutureBuilder(
+                              future: loadData,
+                              builder: (context, snapshot) {
+                                if (snapshot.connectionState !=
+                                    ConnectionState.done) {
+                                  return const Center(
+                                    child: CircularProgressIndicator(),
+                                  );
+                                }
+                                walletCtl.text =
+                                    usergetRes[0].wallet.toString();
+                                return Text(
+                                  '${walletCtl.text.isNotEmpty ? walletCtl.text : '0'} บาท',
+                                  style: TextStyle(
+                                    fontSize: 28,
+                                    fontWeight: FontWeight.bold,
+                                    fontFamily: 'Revalia',
+                                    color: Colors.white,
+                                  ),
+                                );
+                              }),
                         ),
                       ],
                     ),
@@ -367,6 +385,15 @@ class _WalletPageState extends State<WalletPage> {
         ),
       ),
     );
+  }
+
+  Future<void> loadDataAstnc() async {
+    // await Future.delayed(const Duration(seconds: 2), () => print("BBB"));
+    var value = await Configuration.getConfig();
+    String url = value['apiEndPoint'];
+
+    var json = await http.get(Uri.parse('$url/users/${widget.uid}'));
+    usergetRes = useruidGetResFromJson(json.body);
   }
 
   void _handlePrizeClaim() {

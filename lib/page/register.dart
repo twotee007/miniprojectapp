@@ -94,7 +94,7 @@ class _registerPageState extends State<registerPage> {
 
           // ข้อความ Sign up พร้อมไอคอน
           Positioned(
-            top: 110, // ปรับตำแหน่งตามที่คุณต้องการ
+            top: 130, // ปรับตำแหน่งตามที่คุณต้องการ
             left: 20, // ปรับตำแหน่งตามที่คุณต้องการ
             child: Row(
               children: [
@@ -106,22 +106,7 @@ class _registerPageState extends State<registerPage> {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                const SizedBox(width: 130), // ช่องว่างระหว่างข้อความและไอคอน
-                Container(
-                  padding: const EdgeInsets.all(8), // ขนาดของวงกลมรอบไอคอน
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    border: Border.all(
-                      color: const Color(0xFF471AA0), // สีของเส้นวงกลม
-                      width: 2, // ความหนาของเส้นวงกลม
-                    ),
-                  ),
-                  child: const Icon(
-                    Icons.person_add, // ใช้ไอคอน add person
-                    size: 70, // ขนาดของไอคอน
-                    color: Color(0xFF471AA0), // สีของไอคอน
-                  ),
-                ),
+                // ช่องว่างระหว่างข้อความและไอคอน
               ],
             ),
           ),
@@ -393,7 +378,7 @@ class _registerPageState extends State<registerPage> {
           wallet: int.parse(addmoneyController.text), // Convert String to int
           email: emailController.text,
           img:
-              "https://w7.pngwing.com/pngs/178/595/png-transparent-user-profile-computer-icons-login-user-avatars-thumbnail.png");
+              "https://e7.pngegg.com/pngimages/340/946/png-clipart-avatar-user-computer-icons-software-developer-avatar-child-face-thumbnail.png");
       http
           .post(Uri.parse('$url/users/adduser'),
               headers: {"Content-Type": "application/json; charset=utf-8"},

@@ -26,6 +26,7 @@ class _UserPageState extends State<UserPage> {
   TextEditingController usernameCtl = TextEditingController();
   TextEditingController fullnameCtl = TextEditingController();
   TextEditingController emailCtl = TextEditingController();
+  TextEditingController imgCtl = TextEditingController();
   @override
   void initState() {
     // TODO: implement initState
@@ -121,6 +122,7 @@ class _UserPageState extends State<UserPage> {
                           fullnameCtl.text = usergetRes[0].fullname;
                           usernameCtl.text = usergetRes[0].username;
                           emailCtl.text = usergetRes[0].email;
+
                           return Column(
                             children: [
                               SizedBox(
@@ -175,20 +177,32 @@ class _UserPageState extends State<UserPage> {
                         }),
                   ),
                   // Profile Picture
-                  Positioned(
-                    top: 60, // ปรับตำแหน่งรูปโปรไฟล์ให้ต่ำลง
-                    left: MediaQuery.of(context).size.width / 2 -
-                        80, // จัดกลางแนวนอน
-                    child: CircleAvatar(
-                      radius: 60,
-                      backgroundColor: Colors.blueAccent,
-                      child: Icon(
-                        Icons.person,
-                        size: 80,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
+                  FutureBuilder(
+                      future: loadData,
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState != ConnectionState.done) {
+                          return const Center(
+                            child: CircularProgressIndicator(),
+                          );
+                        }
+                        imgCtl.text = usergetRes[0].img;
+                        return Positioned(
+                          top: 60, // ปรับตำแหน่งตามต้องการ
+                          left: MediaQuery.of(context).size.width / 2 -
+                              93, // จัดกลางแนวนอน
+                          child: ClipOval(
+                            child: Container(
+                              width: 150, // ขนาดของรูป
+                              height: 150, // ขนาดของรูป
+                              child: Image.network(
+                                imgCtl.text,
+                                fit: BoxFit
+                                    .cover, // ตัดและปรับขนาดให้เต็มพื้นที่
+                              ),
+                            ),
+                          ),
+                        );
+                      }),
                 ],
               ),
             ),
