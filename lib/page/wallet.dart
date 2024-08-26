@@ -83,7 +83,7 @@ class _WalletPageState extends State<WalletPage> {
             ),
           ),
           // Title Positioned Above the White Container
-          Positioned(
+          const Positioned(
             top: 60, // Adjust this value as needed
             left: 30,
             right: 20,
@@ -92,7 +92,7 @@ class _WalletPageState extends State<WalletPage> {
               style: TextStyle(
                 fontSize: 24,
                 fontFamily: 'Revalia', // Use Revalia font
-                color: const Color.fromARGB(255, 255, 255, 255),
+                color: Color.fromARGB(255, 255, 255, 255),
               ),
             ),
           ),
@@ -120,7 +120,7 @@ class _WalletPageState extends State<WalletPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // New Text Above the Wallet Information
-                  Text(
+                  const Text(
                     'วอเลท & สลาก',
                     style: TextStyle(
                       fontSize: 20,
@@ -129,27 +129,27 @@ class _WalletPageState extends State<WalletPage> {
                       color: Colors.black,
                     ),
                   ),
-                  SizedBox(height: 10),
+                  const SizedBox(height: 10),
                   // Wallet Information
                   Container(
                     width: screenWidth -
                         40, // Adjust the width to fit within the margin
-                    padding: EdgeInsets.all(15),
+                    padding: const EdgeInsets.all(15),
                     decoration: BoxDecoration(
-                      color: Color(0xFF471AA0), // Dark purple background
+                      color: const Color(0xFF471AA0), // Dark purple background
                       borderRadius: BorderRadius.circular(10),
                       boxShadow: [
                         BoxShadow(
                           color: Colors.black.withOpacity(0.1),
                           blurRadius: 10,
-                          offset: Offset(0, 5),
+                          offset: const Offset(0, 5),
                         ),
                       ],
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
+                        const Text(
                           'เงินคงเหลือ :',
                           style: TextStyle(
                             fontSize: 16,
@@ -158,7 +158,7 @@ class _WalletPageState extends State<WalletPage> {
                             color: Colors.white,
                           ),
                         ),
-                        SizedBox(height: 8),
+                        const SizedBox(height: 8),
                         Align(
                           alignment: Alignment.center,
                           child: FutureBuilder(
@@ -174,7 +174,7 @@ class _WalletPageState extends State<WalletPage> {
                                     usergetRes[0].wallet.toString();
                                 return Text(
                                   '${walletCtl.text.isNotEmpty ? walletCtl.text : '0'} บาท',
-                                  style: TextStyle(
+                                  style: const TextStyle(
                                     fontSize: 28,
                                     fontWeight: FontWeight.bold,
                                     fontFamily: 'Revalia',
@@ -186,13 +186,13 @@ class _WalletPageState extends State<WalletPage> {
                       ],
                     ),
                   ),
-                  SizedBox(height: 10),
+                  const SizedBox(height: 10),
                   // Total Lottery Tickets
                   Container(
-                    padding: EdgeInsets.symmetric(vertical: 10),
+                    padding: const EdgeInsets.symmetric(vertical: 10),
                     alignment: Alignment.center,
                     decoration: BoxDecoration(
-                      color: Color(0xFF32B967), // Green background
+                      color: const Color(0xFF32B967), // Green background
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: FutureBuilder(
@@ -207,7 +207,7 @@ class _WalletPageState extends State<WalletPage> {
                           lenlotto.text = lottoGetResUser.length.toString();
                           return Text(
                             'สลากทั้งหมด : ${lenlotto.text} ใบ',
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontSize: 18,
                               fontFamily: 'RhodiumLibre',
                               color: Colors.white,
@@ -215,29 +215,59 @@ class _WalletPageState extends State<WalletPage> {
                           );
                         }),
                   ),
-                  SizedBox(height: 20),
+                  const SizedBox(height: 20),
                   // Lottery Tickets List
                   Expanded(
-                    child: ListView(
-                      padding:
-                          EdgeInsets.only(bottom: 100), // เพิ่ม padding ตรงนี้
-                      children: [
-                        _buildLotteryCard(
-                          '1 2 3 4 5 6',
-                          'คุณถูกรางวัลที่ 1 2000 บาท',
-                          true,
-                        ),
-                        _buildLotteryCard(
-                          '1 2 3 4 5 6',
-                          'น่าเสียดายคุณไม่ถูกรางวัล',
-                          false,
-                        ),
-                        _buildLotteryCard(
-                          '1 2 3 4 5 6',
-                          'น่าเสียดายคุณไม่ถูกรางวัล',
-                          false,
-                        ),
-                      ],
+                    child: FutureBuilder(
+                      future: loadData,
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState != ConnectionState.done) {
+                          return const Center(
+                            child: CircularProgressIndicator(),
+                          );
+                        }
+                        return ListView(
+                          padding: const EdgeInsets.only(bottom: 100),
+                          children: lottoGetResUser
+                              .map<Widget?>((lottouser) {
+                                if (lottouser.accepted == null) {
+                                  return _lottoCardnoaccepted(
+                                      _formatNumber(lottouser.number));
+                                } else if (lottouser.accepted == 0) {
+                                  bool isWinner = false;
+
+                                  String pricelotto = '';
+                                  if (lottouser.prize == '0') {
+                                    pricelotto = 'น่าเสียดายคุณไม่ถูกรางวัล';
+                                    isWinner = false;
+                                  } else if (lottouser.prize == '1') {
+                                    pricelotto = 'คุณถูกรางวัลที่ 1 2000 บาท';
+                                    isWinner = true;
+                                  } else if (lottouser.prize == '2') {
+                                    pricelotto = 'คุณถูกรางวัลที่ 2 1500 บาท';
+                                    isWinner = true;
+                                  } else if (lottouser.prize == '3') {
+                                    pricelotto = 'คุณถูกรางวัลที่ 3 1000 บาท';
+                                    isWinner = true;
+                                  } else if (lottouser.prize == '4') {
+                                    pricelotto = 'คุณถูกรางวัลที่ 4 500 บาท';
+                                    isWinner = true;
+                                  } else if (lottouser.prize == '5') {
+                                    pricelotto = 'คุณถูกรางวัลที่ 5 250 บาท';
+                                    isWinner = true;
+                                  }
+                                  return _lottoCardupaccepted(
+                                      _formatNumber(lottouser.number),
+                                      pricelotto, // Placeholder, replace with your actual result text
+                                      isWinner,
+                                      lottouser.lid);
+                                }
+                                return null;
+                              })
+                              .whereType<Widget>()
+                              .toList(),
+                        );
+                      },
                     ),
                   ),
                 ],
@@ -283,15 +313,114 @@ class _WalletPageState extends State<WalletPage> {
     return number.split('').join(' ');
   }
 
-  Widget _buildLotteryCard(String numbers, String result, bool isWinner) {
-    List<String> numberList = numbers.split(' '); // แยกตัวเลข
+  Widget _lottoCardnoaccepted(String numbers) {
+    List<String> numberList = numbers.split(' ');
 
     return Card(
-      margin: EdgeInsets.symmetric(vertical: 5),
+      margin: const EdgeInsets.symmetric(vertical: 7),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10),
+        side: const BorderSide(
+          color: Color(0xFFC17E7E),
+          width: 2,
+        ),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(7.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Image.asset(
+                  'assets/img/file.png',
+                  width: 75,
+                  height: 75,
+                ),
+                const SizedBox(width: 5),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Image.asset(
+                            'assets/img/Lotto.png',
+                            width: 40,
+                            height: 30,
+                          ),
+                          const SizedBox(width: 10),
+                          const Text(
+                            'สลาก LOTTO168',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontFamily: 'Revalia',
+                              color: Color(0xFF5B1B92),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 10),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: numberList.map((number) {
+                          return Container(
+                            padding: const EdgeInsets.all(8.0),
+                            decoration: BoxDecoration(
+                              border: Border.all(
+                                color: const Color(0xFF471AA0), // Border color
+                                width: 2, // Border thickness
+                              ),
+                              borderRadius: BorderRadius.circular(4.0),
+                            ),
+                            child: Center(
+                              child: Text(
+                                number,
+                                style: const TextStyle(
+                                  fontSize: 16, // Font size
+                                  fontWeight: FontWeight.bold,
+                                  color: Color(0xFF471AA0), // Font color
+                                ),
+                              ),
+                            ),
+                          );
+                        }).toList(),
+                      ),
+                      const SizedBox(height: 10),
+                      const Center(
+                        child: Text(
+                          'รอประกาศผล',
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Color.fromARGB(255, 83, 9, 202),
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                      // Price and Purchase Button
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _lottoCardupaccepted(
+      String numbers, String result, bool isWinner, int lid) {
+    List<String> numberList = numbers.split(' '); // แยกตัวเลข
+    log(isWinner.toString());
+    log(result.toString());
+    return Card(
+      margin: const EdgeInsets.symmetric(vertical: 5),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(15),
         side: BorderSide(
-          color: isWinner ? Color(0xFF0ED600) : Colors.red,
+          color: isWinner ? const Color(0xFF0ED600) : Colors.red,
           width: 2,
         ),
       ),
@@ -311,7 +440,7 @@ class _WalletPageState extends State<WalletPage> {
                     height: 75, // Adjust the size as needed
                   ),
                 ),
-                SizedBox(width: 5),
+                const SizedBox(width: 5),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -324,8 +453,8 @@ class _WalletPageState extends State<WalletPage> {
                             width: 40,
                             height: 30,
                           ),
-                          SizedBox(width: 10),
-                          Text(
+                          const SizedBox(width: 10),
+                          const Text(
                             'สลาก LOTTO168',
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
@@ -335,16 +464,16 @@ class _WalletPageState extends State<WalletPage> {
                           ),
                         ],
                       ),
-                      SizedBox(height: 10),
+                      const SizedBox(height: 10),
                       // Numbers Row
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: numberList.map((number) {
                           return Container(
-                            padding: EdgeInsets.all(8.0), // ลด padding
+                            padding: const EdgeInsets.all(8.0), // ลด padding
                             decoration: BoxDecoration(
                               border: Border.all(
-                                color: Color(0xFF471AA0), // สีกรอบ
+                                color: const Color(0xFF471AA0), // สีกรอบ
                                 width: 1.5,
                                 // ลดความหนาของ border
                               ),
@@ -353,7 +482,7 @@ class _WalletPageState extends State<WalletPage> {
                             child: Center(
                               child: Text(
                                 number,
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 14, // ลดขนาดตัวเลข
                                   fontWeight: FontWeight.bold,
                                   color: Color(0xFF471AA0), // สีตัวเลข
@@ -363,12 +492,13 @@ class _WalletPageState extends State<WalletPage> {
                           );
                         }).toList(),
                       ),
-                      SizedBox(height: 10),
+                      const SizedBox(height: 10),
                       Text(
                         result,
                         style: TextStyle(
                           fontSize: 14,
-                          color: isWinner ? Color(0xFF0ED600) : Colors.red,
+                          color:
+                              isWinner ? const Color(0xFF0ED600) : Colors.red,
                           fontFamily: 'Revalia',
                         ),
                       ),
@@ -377,7 +507,7 @@ class _WalletPageState extends State<WalletPage> {
                 ),
               ],
             ),
-            SizedBox(height: 10),
+            const SizedBox(height: 10),
             // ข้อความรับรางวัลที่สามารถกดได้
             Visibility(
               visible: isWinner,
@@ -386,9 +516,9 @@ class _WalletPageState extends State<WalletPage> {
                   _handlePrizeClaim(); // ฟังก์ชันจัดการการคลิกที่ข้อความ
                 },
                 child: Container(
-                  padding: EdgeInsets.symmetric(vertical: 10),
+                  padding: const EdgeInsets.symmetric(vertical: 10),
                   alignment: Alignment.centerRight,
-                  child: Text(
+                  child: const Text(
                     'คลิกที่สลากแล้วรับรางวัล',
                     style: TextStyle(
                       fontSize: 16,
@@ -425,14 +555,14 @@ class _WalletPageState extends State<WalletPage> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('รับรางวัล'),
-          content: Text('คุณได้คลิกเพื่อรับรางวัลแล้ว!'),
+          title: const Text('รับรางวัล'),
+          content: const Text('คุณได้คลิกเพื่อรับรางวัลแล้ว!'),
           actions: [
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              child: Text('ตกลง'),
+              child: const Text('ตกลง'),
             ),
           ],
         );
@@ -448,14 +578,14 @@ void _handlePrizeClaim(dynamic context) {
     context: context,
     builder: (BuildContext context) {
       return AlertDialog(
-        title: Text('รับรางวัล'),
-        content: Text('คุณได้คลิกเพื่อรับรางวัลแล้ว!'),
+        title: const Text('รับรางวัล'),
+        content: const Text('คุณได้คลิกเพื่อรับรางวัลแล้ว!'),
         actions: [
           TextButton(
             onPressed: () {
               Navigator.of(context).pop();
             },
-            child: Text('ตกลง'),
+            child: const Text('ตกลง'),
           ),
         ],
       );
