@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:developer';
 import 'dart:ui'; // Import for BackdropFilter
 import 'package:flutter/material.dart';
@@ -26,7 +27,6 @@ class _LottoPurchasePageState extends State<LottoPage> {
   late Future<void> loadData;
   String searchMessage = 'ทั้งหมด';
   TextEditingController walletctl = TextEditingController();
-
   // Add TextEditingController for each input field
   final List<TextEditingController> controllers =
       List.generate(6, (index) => TextEditingController());
@@ -37,11 +37,11 @@ class _LottoPurchasePageState extends State<LottoPage> {
     log(widget.uid.toString());
     loadData = loadDataAstnc();
     searchMessage = 'ทั้งหมด';
-    for (var controller in controllers) {
-      controller.addListener(() {
-        // searchLotto();
-      });
-    }
+    // for (var controller in controllers) {
+    //   controller.addListener(() {
+    //     // searchLotto();
+    //   });
+    // }
   }
 
   @override
@@ -54,49 +54,113 @@ class _LottoPurchasePageState extends State<LottoPage> {
   }
 
   // Search logic based on the input numbers
-  void searchLotto() {
-    setState(() {
-      // Collect input digits from the controllers
-      List<String> inputDigits = controllers.map((e) => e.text).toList();
-
-      // Check if all input fields are empty
-      if (inputDigits.every((digit) => digit.isEmpty)) {
-        // Reset to show all lotto results
-        loadData = loadDataAstnc();
-        searchMessage = 'ทั้งหมด'; // Reset message
-        // Clear previous search results
+  void searchLotto() async {
+    // setState(() {
+    //   // Collect input digits from the controllers
+    List<String> inputDigits = controllers.map((e) => e.text).toList();
+    String numbersearch = '';
+    for (var i = 0; i < inputDigits.length; i++) {
+      if (inputDigits[i].isNotEmpty) {
+        numbersearch += inputDigits[i];
       } else {
-        // Generate the search pattern with asterisks
-        searchMessage = 'ผลลัพธ์เลขที่ต้องการ=> ' +
-            inputDigits.map((digit) => digit.isEmpty ? '*' : digit).join(' ');
-
-        // Filter lotto results based on input digits
-        var filteredResults = lottoGetRes.where((lotto) {
-          String formattedNumber = lotto.number;
-
-          // Check if the formatted number matches the input digits at specific positions
-          for (int i = 0; i < inputDigits.length; i++) {
-            if (inputDigits[i].isNotEmpty &&
-                (formattedNumber.length <= i ||
-                    formattedNumber[i] != inputDigits[i])) {
-              return false; // Exclude if not matching
-            }
-          }
-          return true; // Include if matching
-        }).toList();
-
-        // Update the lottoGetRes with filtered results
-        if (filteredResults.isEmpty) {
-          // If no results, notify the user and reset data for continuous search
-          searchMessage = 'ไม่พบเลขที่ท่านต้องการ';
-          loadData = loadDataAstnc(); // Reload all data
-        } else {
-          lottoGetRes = filteredResults;
-
-          // Update the lottoGetRes with the filtered results
-        }
+        numbersearch += '_';
       }
-    });
+    }
+    var value = await Configuration.getConfig();
+    var url = value['apiEndPoint'];
+    var jsonBody = {
+      "numlotto": numbersearch,
+    };
+    try {
+      var res = await http.post(
+        Uri.parse('$url/lotto/searchlotto'),
+        headers: {"Content-Type": "application/json; charset=utf-8"},
+        body: jsonEncode(jsonBody),
+      );
+      log('Response Status Code: ${res.statusCode}');
+      if (res.statusCode == 201 || res.statusCode == 200) {
+        // แปลง JSON ให้เป็น List<LottoGetRes>
+        List<LottoGetRes> lottosearch = lottoGetResFromJson(res.body);
+
+        setState(() {
+          lottoGetRes = lottosearch;
+          searchMessage = 'ผลลัพธ์เลขที่ต้องการ=> ' +
+              inputDigits.map((digit) => digit.isEmpty ? '*' : digit).join(' ');
+        });
+
+        if (lottoGetRes.isNotEmpty) {
+          log('results found it');
+        } else {
+          log('No results found');
+          setState(() {
+            searchMessage = 'ไม่พบเลขที่ท่านต้องการ';
+          });
+        }
+        if (numbersearch == '______') {
+          setState(() {
+            loadData = loadDataAstnc();
+            searchMessage = 'ทั้งหมด';
+          });
+        }
+      } else {
+        log('Error: ${res.statusCode}');
+        setState(() {
+          searchMessage = 'ทั้งหมด';
+        });
+      }
+    } catch (err) {
+      log('Error during searchLotto: $err');
+      setState(() {
+        searchMessage = 'เกิดข้อผิดพลาด: $err';
+      });
+    }
+    numbersearch = '';
+    // if (numbersearch == '______') {
+    //   loadData = loadDataAstnc();
+    //   searchMessage = 'ทั้งหมด';
+    // } else {
+    //   setState(() {
+    //     searchMessage = 'ผลลัพธ์เลขที่ต้องการ=> ' +
+    //         inputDigits.map((digit) => digit.isEmpty ? '*' : digit).join(' ');
+    //   });
+    // }
+    // log(numbersearch);
+    //   // Check if all input fields are empty
+    //   if (inputDigits.every((digit) => digit.isEmpty)) {
+    //     // Reset to show all lotto results
+    //     loadData = loadDataAstnc();
+    //     searchMessage = 'ทั้งหมด'; // Reset message
+    //     // Clear previous search results
+    //   } else {
+    //     // Generate the search pattern with asterisks
+
+    //     // Filter lotto results based on input digits
+    //     var filteredResults = lottoGetRes.where((lotto) {
+    //       String formattedNumber = lotto.number;
+
+    //       // Check if the formatted number matches the input digits at specific positions
+    //       for (int i = 0; i < inputDigits.length; i++) {
+    //         if (inputDigits[i].isNotEmpty &&
+    //             (formattedNumber.length <= i ||
+    //                 formattedNumber[i] != inputDigits[i])) {
+    //           return false; // Exclude if not matching
+    //         }
+    //       }
+    //       return true; // Include if matching
+    //     }).toList();
+
+    //     // Update the lottoGetRes with filtered results
+    //     if (filteredResults.isEmpty) {
+    //       // If no results, notify the user and reset data for continuous search
+    //       searchMessage = 'ไม่พบเลขที่ท่านต้องการ';
+    //       loadData = loadDataAstnc(); // Reload all data
+    //     } else {
+    //       lottoGetRes = filteredResults;
+
+    //       // Update the lottoGetRes with the filtered results
+    //     }
+    //   }
+    // });
   }
 
   @override
@@ -382,7 +446,9 @@ class _LottoPurchasePageState extends State<LottoPage> {
                             children: lottoGetRes
                                 .map(
                                   (lotto) => _buildLotteryCard(
-                                      _formatNumber(lotto.number), lotto.price),
+                                      _formatNumber(lotto.number),
+                                      lotto.price,
+                                      lotto.lid),
                                 )
                                 .toList(),
                           );
@@ -433,7 +499,7 @@ class _LottoPurchasePageState extends State<LottoPage> {
     return number.split('').join(' ');
   }
 
-  Widget _buildLotteryCard(String numbers, int price) {
+  Widget _buildLotteryCard(String numbers, int price, int lid) {
     List<String> numberList = numbers.split(' ');
 
     return Card(
@@ -523,7 +589,7 @@ class _LottoPurchasePageState extends State<LottoPage> {
                           ),
                           ElevatedButton.icon(
                             onPressed: () {
-                              // Action for purchase button
+                              userbuylotto(widget.uid, lid, numbers);
                             },
                             icon: Container(
                               decoration: BoxDecoration(
@@ -582,5 +648,138 @@ class _LottoPurchasePageState extends State<LottoPage> {
     usergetRes = useruidGetResFromJson(jsonuser.body);
   }
 
-  void getlotto() {}
+  void userbuylotto(int uid, int lid, String numbers) async {
+    // Show confirmation dialog
+    bool confirm = await showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        title: const Text(
+          'ยืนยันการซื้อ',
+          textAlign: TextAlign.center,
+        ),
+        content: Text(
+          'คุณต้องการซื้อสลากหมายเลข $numbers นี้ใช่หรือไม่?',
+          textAlign: TextAlign.center,
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop(false); // User tapped 'Cancel'
+            },
+            child: const Text('ยกเลิก'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop(true); // User tapped 'Confirm'
+            },
+            child: const Text('ยืนยัน'),
+          ),
+        ],
+      ),
+    );
+
+    // If user confirms
+    if (confirm) {
+      // Show a dialog to indicate the purchase is being processed
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => AlertDialog(
+          title: const Text('กำลังดำเนินการ'),
+          content: const Text('กรุณารอสักครู่...'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context); // Close the processing dialog
+              },
+              child: const Text('ปิด'),
+            ),
+          ],
+        ),
+      );
+
+      var value = await Configuration.getConfig();
+      String url = value['apiEndPoint'];
+
+      var jsonBody = {
+        "uid": uid,
+        "lid": lid,
+      };
+
+      try {
+        var res = await http.put(
+          Uri.parse('$url/lotto/userbuylotto'),
+          headers: {"Content-Type": "application/json; charset=utf-8"},
+          body: jsonEncode(jsonBody),
+        );
+
+        Navigator.pop(context); // Close the processing dialog
+
+        if (res.statusCode == 201 || res.statusCode == 200) {
+          // Show success dialog
+          showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+              title: const Text('สำเร็จ'),
+              content: const Text('บันทึกข้อมูลเรียบร้อย'),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(context); // Close the success dialog
+                  },
+                  child: const Text('ปิด'),
+                ),
+              ],
+            ),
+          );
+
+          // Handle successful purchase
+          log('Purchase successful for user $uid with lottery ID $lid');
+          setState(() {
+            // Reload data or update UI
+            loadData = loadDataAstnc();
+          });
+        } else {
+          // Show error dialog
+          showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+              title: const Text('ข้อผิดพลาด'),
+              content: Text('เกิดข้อผิดพลาด: ${res.statusCode}'),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(context); // Close the error dialog
+                  },
+                  child: const Text('ปิด'),
+                ),
+              ],
+            ),
+          );
+          log('Error purchasing lottery: ${res.statusCode}');
+        }
+      } catch (err) {
+        Navigator.pop(context); // Close the processing dialog
+
+        // Show error dialog
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('ข้อผิดพลาด'),
+            content: Text('เกิดข้อผิดพลาด: $err'),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context); // Close the error dialog
+                },
+                child: const Text('ปิด'),
+              ),
+            ],
+          ),
+        );
+        log('Error during userbuylotto: $err');
+      }
+    }
+  }
 }

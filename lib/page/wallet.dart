@@ -7,6 +7,7 @@ import 'package:miniprojectapp/page/home.dart';
 import 'package:miniprojectapp/page/lotto.dart';
 import 'package:miniprojectapp/page/user.dart';
 import 'package:http/http.dart' as http;
+import 'package:miniprojectapp/response/lotto_get_res.dart';
 import 'package:miniprojectapp/response/useruid_get_res.dart';
 
 class WalletPage extends StatefulWidget {
@@ -20,7 +21,9 @@ class WalletPage extends StatefulWidget {
 class _WalletPageState extends State<WalletPage> {
   String activePage = 'wallet'; // Track the active page
   List<UseruidGetRes> usergetRes = [];
+  List<LottoGetRes> lottoGetResUser = [];
   TextEditingController walletCtl = TextEditingController();
+  TextEditingController lenlotto = TextEditingController();
   late Future<void> loadData;
   @override
   void initState() {
@@ -192,14 +195,25 @@ class _WalletPageState extends State<WalletPage> {
                       color: Color(0xFF32B967), // Green background
                       borderRadius: BorderRadius.circular(10),
                     ),
-                    child: Text(
-                      'สลากทั้งหมด : 3 ใบ',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontFamily: 'RhodiumLibre',
-                        color: Colors.white,
-                      ),
-                    ),
+                    child: FutureBuilder(
+                        future: loadData,
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState !=
+                              ConnectionState.done) {
+                            return const Center(
+                              child: CircularProgressIndicator(),
+                            );
+                          }
+                          lenlotto.text = lottoGetResUser.length.toString();
+                          return Text(
+                            'สลากทั้งหมด : ${lenlotto.text} ใบ',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontFamily: 'RhodiumLibre',
+                              color: Colors.white,
+                            ),
+                          );
+                        }),
                   ),
                   SizedBox(height: 20),
                   // Lottery Tickets List
@@ -263,6 +277,10 @@ class _WalletPageState extends State<WalletPage> {
         ],
       ),
     );
+  }
+
+  String _formatNumber(String number) {
+    return number.split('').join(' ');
   }
 
   Widget _buildLotteryCard(String numbers, String result, bool isWinner) {
@@ -394,6 +412,10 @@ class _WalletPageState extends State<WalletPage> {
 
     var json = await http.get(Uri.parse('$url/users/${widget.uid}'));
     usergetRes = useruidGetResFromJson(json.body);
+
+    var jsonlotto =
+        await http.get(Uri.parse('$url/users/lottouser/${widget.uid}'));
+    lottoGetResUser = lottoGetResFromJson(jsonlotto.body);
   }
 
   void _handlePrizeClaim() {

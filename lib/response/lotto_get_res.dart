@@ -16,7 +16,7 @@ class LottoGetRes {
   String number;
   String prize;
   dynamic uid;
-  int accepted;
+  dynamic accepted;
 
   LottoGetRes({
     required this.lid,
