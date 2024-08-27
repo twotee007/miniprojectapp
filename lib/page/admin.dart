@@ -369,6 +369,7 @@ class _AdminPage extends State<AdminPage> {
     );
   }
 }
+
 //============================================ S T A R T  F R O M  T H I S ================================
 class RandomButton extends StatefulWidget {
   final VoidCallback onClose;
@@ -620,6 +621,7 @@ class PopupButton extends StatelessWidget {
     );
   }
 }
+
 class ResetButtonn extends StatelessWidget {
   final VoidCallback onClose;
 
@@ -728,5 +730,3 @@ class ResetButtonn extends StatelessWidget {
     );
   }
 }
-
-

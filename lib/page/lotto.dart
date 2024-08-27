@@ -589,7 +589,7 @@ class _LottoPurchasePageState extends State<LottoPage> {
                           ),
                           ElevatedButton.icon(
                             onPressed: () {
-                              userbuylotto(widget.uid, lid, numbers);
+                              userbuylotto(context, widget.uid, lid, numbers);
                             },
                             icon: Container(
                               decoration: BoxDecoration(
@@ -648,32 +648,84 @@ class _LottoPurchasePageState extends State<LottoPage> {
     usergetRes = useruidGetResFromJson(jsonuser.body);
   }
 
-  void userbuylotto(int uid, int lid, String numbers) async {
+  void userbuylotto(
+      BuildContext context, int uid, int lid, String numbers) async {
     // Show confirmation dialog
     bool confirm = await showDialog(
       context: context,
       barrierDismissible: false,
       builder: (context) => AlertDialog(
-        title: const Text(
-          'ยืนยันการซื้อ',
-          textAlign: TextAlign.center,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20.0),
         ),
-        content: Text(
-          'คุณต้องการซื้อสลากหมายเลข $numbers นี้ใช่หรือไม่?',
-          textAlign: TextAlign.center,
+        titlePadding: EdgeInsets.zero,
+        title: Container(
+          padding: const EdgeInsets.all(12.0),
+          decoration: const BoxDecoration(
+            color: Colors.purple,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(20.0)),
+          ),
+          child: const Text(
+            'ซื้อสลาก',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+              fontSize: 18,
+            ),
+          ),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              'คุณยืนยันจะซื้อสลากเลข\n: $numbers\nหรือไม่?',
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 16,
+              ),
+            ),
+          ],
         ),
         actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop(false); // User tapped 'Cancel'
-            },
-            child: const Text('ยกเลิก'),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop(true); // User tapped 'Confirm'
-            },
-            child: const Text('ยืนยัน'),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color.fromARGB(255, 199, 91, 84),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 24.0, vertical: 8.0),
+                    shape: RoundedRectangleBorder(
+                      borderRadius:
+                          BorderRadius.circular(8.0), // เปลี่ยนเป็นขอบโค้งมน
+                    ),
+                  ),
+                  onPressed: () {
+                    Navigator.of(context).pop(false); // กด 'ยกเลิก'
+                  },
+                  child: const Icon(Icons.close, color: Colors.white),
+                ),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color.fromARGB(255, 104, 175, 106),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 24.0, vertical: 8.0),
+                    shape: RoundedRectangleBorder(
+                      borderRadius:
+                          BorderRadius.circular(8.0), // เปลี่ยนเป็นขอบโค้งมน
+                    ),
+                  ),
+                  onPressed: () {
+                    Navigator.of(context).pop(true); // กด 'ยืนยัน'
+                  },
+                  child: const Icon(Icons.check, color: Colors.white),
+                ),
+              ],
+            ),
           ),
         ],
       ),
@@ -686,16 +738,33 @@ class _LottoPurchasePageState extends State<LottoPage> {
         context: context,
         barrierDismissible: false,
         builder: (context) => AlertDialog(
-          title: const Text('กำลังดำเนินการ'),
-          content: const Text('กรุณารอสักครู่...'),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context); // Close the processing dialog
-              },
-              child: const Text('ปิด'),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20.0),
+          ),
+          titlePadding: EdgeInsets.zero,
+          title: Container(
+            padding: const EdgeInsets.all(12.0),
+            decoration: const BoxDecoration(
+              color: Colors.purple,
+              borderRadius: BorderRadius.vertical(top: Radius.circular(20.0)),
             ),
-          ],
+            child: const Text(
+              'กำลังดำเนินการ',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+                fontSize: 18,
+              ),
+            ),
+          ),
+          content: const Text(
+            'กรุณารอสักครู่...',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 16,
+            ),
+          ),
         ),
       );
 
@@ -721,14 +790,64 @@ class _LottoPurchasePageState extends State<LottoPage> {
           showDialog(
             context: context,
             builder: (context) => AlertDialog(
-              title: const Text('สำเร็จ'),
-              content: const Text('บันทึกข้อมูลเรียบร้อย'),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20.0),
+              ),
+              titlePadding: EdgeInsets.zero,
+              title: Container(
+                padding: const EdgeInsets.all(12.0),
+                decoration: const BoxDecoration(
+                  color: Color.fromARGB(
+                      255, 142, 76, 175), // เปลี่ยนสีให้เข้ากับความสำเร็จ
+                  borderRadius:
+                      BorderRadius.vertical(top: Radius.circular(20.0)),
+                ),
+                child: const Text(
+                  'สำเร็จ',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                    fontSize: 18,
+                  ),
+                ),
+              ),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: const [
+                  Text(
+                    'บันทึกข้อมูลเรียบร้อย',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
+                  ),
+                ],
+              ),
               actions: [
-                TextButton(
-                  onPressed: () {
-                    Navigator.pop(context); // Close the success dialog
-                  },
-                  child: const Text('ปิด'),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor:
+                              const Color.fromARGB(255, 199, 91, 84),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 24.0, vertical: 8.0),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8.0),
+                          ),
+                        ),
+                        onPressed: () {
+                          Navigator.of(context).pop(); // ปิด Dialog
+                        },
+                        child: const Icon(Icons.close, color: Colors.white),
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),
@@ -742,11 +861,17 @@ class _LottoPurchasePageState extends State<LottoPage> {
           });
         } else {
           // Show error dialog
+          // Show error dialog
           showDialog(
             context: context,
             builder: (context) => AlertDialog(
-              title: const Text('ข้อผิดพลาด'),
-              content: Text('เกิดข้อผิดพลาด: ${res.statusCode}'),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20.0),
+              ),
+              title: const Text('ข้อผิดพลาด', textAlign: TextAlign.center),
+              content: Text(
+                  'ลูกค้ายอดเงินไม่พอกรุณารอรางวัลออกแล้วลุ้นนะครับ: ${res.statusCode}',
+                  textAlign: TextAlign.center),
               actions: [
                 TextButton(
                   onPressed: () {
@@ -763,11 +888,15 @@ class _LottoPurchasePageState extends State<LottoPage> {
         Navigator.pop(context); // Close the processing dialog
 
         // Show error dialog
+        // Show error dialog
         showDialog(
           context: context,
           builder: (context) => AlertDialog(
-            title: const Text('ข้อผิดพลาด'),
-            content: Text('เกิดข้อผิดพลาด: $err'),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20.0),
+            ),
+            title: const Text('ข้อผิดพลาด', textAlign: TextAlign.center),
+            content: Text('เกิดข้อผิดพลาด: $err', textAlign: TextAlign.center),
             actions: [
               TextButton(
                 onPressed: () {

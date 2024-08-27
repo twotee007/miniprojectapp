@@ -570,25 +570,3 @@ class _WalletPageState extends State<WalletPage> {
     );
   }
 }
-
-void _handlePrizeClaim(dynamic context) {
-  // ฟังก์ชันจัดการการคลิกที่ปุ่ม
-  // ทำบางสิ่งเมื่อคลิก เช่น แสดงข้อความ, อัปเดตสถานะ, หรืออื่น ๆ
-  showDialog(
-    context: context,
-    builder: (BuildContext context) {
-      return AlertDialog(
-        title: const Text('รับรางวัล'),
-        content: const Text('คุณได้คลิกเพื่อรับรางวัลแล้ว!'),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-            child: const Text('ตกลง'),
-          ),
-        ],
-      );
-    },
-  );
-}
