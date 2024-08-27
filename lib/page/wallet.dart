@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:developer';
 import 'dart:ui'; // Import for BackdropFilter
 import 'package:flutter/material.dart';
@@ -235,7 +236,7 @@ class _WalletPageState extends State<WalletPage> {
                                       _formatNumber(lottouser.number));
                                 } else if (lottouser.accepted == 0) {
                                   bool isWinner = false;
-
+                                  int money = 0;
                                   String pricelotto = '';
                                   if (lottouser.prize == '0') {
                                     pricelotto = 'น่าเสียดายคุณไม่ถูกรางวัล';
@@ -243,24 +244,30 @@ class _WalletPageState extends State<WalletPage> {
                                   } else if (lottouser.prize == '1') {
                                     pricelotto = 'คุณถูกรางวัลที่ 1 2000 บาท';
                                     isWinner = true;
+                                    money = 2000;
                                   } else if (lottouser.prize == '2') {
                                     pricelotto = 'คุณถูกรางวัลที่ 2 1500 บาท';
                                     isWinner = true;
+                                    money = 1500;
                                   } else if (lottouser.prize == '3') {
                                     pricelotto = 'คุณถูกรางวัลที่ 3 1000 บาท';
                                     isWinner = true;
+                                    money = 1000;
                                   } else if (lottouser.prize == '4') {
                                     pricelotto = 'คุณถูกรางวัลที่ 4 500 บาท';
                                     isWinner = true;
+                                    money = 500;
                                   } else if (lottouser.prize == '5') {
                                     pricelotto = 'คุณถูกรางวัลที่ 5 250 บาท';
                                     isWinner = true;
+                                    money = 250;
                                   }
                                   return _lottoCardupaccepted(
                                       _formatNumber(lottouser.number),
                                       pricelotto, // Placeholder, replace with your actual result text
                                       isWinner,
-                                      lottouser.lid);
+                                      lottouser.lid,
+                                      money);
                                 }
                                 return null;
                               })
@@ -411,7 +418,7 @@ class _WalletPageState extends State<WalletPage> {
   }
 
   Widget _lottoCardupaccepted(
-      String numbers, String result, bool isWinner, int lid) {
+      String numbers, String result, bool isWinner, int lid, int money) {
     List<String> numberList = numbers.split(' '); // แยกตัวเลข
     log(isWinner.toString());
     log(result.toString());
@@ -513,7 +520,8 @@ class _WalletPageState extends State<WalletPage> {
               visible: isWinner,
               child: InkWell(
                 onTap: () {
-                  _handlePrizeClaim(); // ฟังก์ชันจัดการการคลิกที่ข้อความ
+                  _handlePrizeClaim(widget.uid, lid,
+                      money); // ฟังก์ชันจัดการการคลิกที่ข้อความ
                 },
                 child: Container(
                   padding: const EdgeInsets.symmetric(vertical: 10),
@@ -548,66 +556,198 @@ class _WalletPageState extends State<WalletPage> {
     lottoGetResUser = lottoGetResFromJson(jsonlotto.body);
   }
 
-  void _handlePrizeClaim() {
-    // ฟังก์ชันจัดการการคลิกที่ปุ่ม
-    // ทำบางสิ่งเมื่อคลิก เช่น แสดงข้อความ, อัปเดตสถานะ, หรืออื่น ๆ
+  void _handlePrizeClaim(int uid, int lid, int money) async {
+    // แสดง Dialog รอการดำเนินการ
+    log("dasdasadadada    $lid");
     showDialog(
       context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20.0),
+        ),
+        titlePadding: EdgeInsets.zero,
+        title: Container(
+          padding: const EdgeInsets.all(12.0),
+          decoration: const BoxDecoration(
+            color: Colors.purple,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(20.0)),
+          ),
+          child: const Text(
+            'กำลังดำเนินการ',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+              fontSize: 18,
+            ),
+          ),
+        ),
+        content: const Text(
+          'กรุณารอสักครู่...',
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            fontSize: 16,
+          ),
+        ),
+      ),
+    );
+
+    var value = await Configuration.getConfig();
+    String url = value['apiEndPoint'];
+    var jsonBody = {"uid": uid, "lid": lid, "money": money};
+    log("Request Body: $jsonBody");
+    try {
+      var res = await http.put(
+        Uri.parse('$url/users/upprize'),
+        headers: {"Content-Type": "application/json; charset=utf-8"},
+        body: jsonEncode(jsonBody),
+      );
+
+      Navigator.pop(context); // ปิด Dialog รอการดำเนินการ
+
+      if (res.statusCode == 201 || res.statusCode == 200) {
+        // แสดง Dialog สำเร็จ
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20.0),
+            ),
+            titlePadding: EdgeInsets.zero,
+            title: Container(
+              padding: const EdgeInsets.all(12.0),
+              decoration: const BoxDecoration(
+                color: Color.fromARGB(255, 76, 175, 80),
+                borderRadius: BorderRadius.vertical(top: Radius.circular(20.0)),
+              ),
+              child: const Text(
+                'รับรางวัล',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                  fontSize: 18,
+                ),
+              ),
+            ),
+            contentPadding: const EdgeInsets.all(16.0),
+            content: const Text(
+              'คุณได้คลิกเพื่อรับรางวัลแล้ว!',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 16,
+                color: Colors.black87,
+              ),
+            ),
+            actionsPadding: const EdgeInsets.only(bottom: 8.0),
+            actions: [
+              Center(
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color.fromARGB(255, 76, 175, 80),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 24.0, vertical: 8.0),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8.0),
+                    ),
+                  ),
+                  onPressed: () {
+                    Navigator.of(context).pop(); // ปิด Dialog
+                  },
+                  child:
+                      const Text('ตกลง', style: TextStyle(color: Colors.white)),
+                ),
+              ),
+            ],
+          ),
+        );
+        log("ขึ้นเวินสำเร็จ");
+        setState(() {
+          // Reload data or update UI
+          loadData = loadDataAstnc();
+        });
+      } else {
+        // แสดง Dialog ข้อผิดพลาด
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20.0),
+            ),
+            titlePadding: EdgeInsets.zero,
+            title: Container(
+              padding: const EdgeInsets.all(12.0),
+              decoration: const BoxDecoration(
+                color: Color.fromARGB(255, 199, 91, 84),
+                borderRadius: BorderRadius.vertical(top: Radius.circular(20.0)),
+              ),
+              child: const Text(
+                'ข้อผิดพลาด',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                  fontSize: 18,
+                ),
+              ),
+            ),
+            contentPadding: const EdgeInsets.all(16.0),
+            content: const Text(
+              'เกิดข้อผิดพลาดในการรับรางวัล',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 16,
+                color: Colors.black87,
+              ),
+            ),
+            actionsPadding: const EdgeInsets.only(bottom: 8.0),
+            actions: [
+              Center(
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color.fromARGB(255, 199, 91, 84),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 24.0, vertical: 8.0),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8.0),
+                    ),
+                  ),
+                  onPressed: () {
+                    Navigator.pop(context); // ปิด Dialog
+                  },
+                  child:
+                      const Text('ปิด', style: TextStyle(color: Colors.white)),
+                ),
+              ),
+            ],
+          ),
+        );
+        log(': ${res.body}');
+      }
+    } catch (err) {
+      Navigator.pop(context); // ปิด Dialog รอการดำเนินการ
+
+      // แสดง Dialog ข้อผิดพลาด
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20.0),
           ),
-          titlePadding: EdgeInsets.zero,
-          title: Container(
-            padding: const EdgeInsets.all(12.0),
-            decoration: const BoxDecoration(
-              color: Color.fromARGB(
-                  255, 76, 175, 80), // A green color indicating success
-              borderRadius: BorderRadius.vertical(top: Radius.circular(20.0)),
-            ),
-            child: const Text(
-              'รับรางวัล',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
-                fontSize: 18,
-              ),
-            ),
-          ),
-          contentPadding: const EdgeInsets.all(16.0),
-          content: const Text(
-            'คุณได้คลิกเพื่อรับรางวัลแล้ว!',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 16,
-              color: Colors.black87,
-            ),
-          ),
-          actionsPadding: const EdgeInsets.only(bottom: 8.0),
+          title: const Text('ข้อผิดพลาด', textAlign: TextAlign.center),
+          content: Text('เกิดข้อผิดพลาด: $err', textAlign: TextAlign.center),
           actions: [
-            Center(
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color.fromARGB(
-                      255, 76, 175, 80), // Matching the title color
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 24.0, vertical: 8.0),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8.0),
-                  ),
-                ),
-                onPressed: () {
-                  Navigator.of(context).pop(); // Close the dialog
-                },
-                child:
-                    const Text('ตกลง', style: TextStyle(color: Colors.white)),
-              ),
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context); // ปิด Dialog ข้อผิดพลาด
+              },
+              child: const Text('ปิด'),
             ),
           ],
-        );
-      },
-    );
+        ),
+      );
+      log('Error during prize claim: $err');
+    }
   }
 }
