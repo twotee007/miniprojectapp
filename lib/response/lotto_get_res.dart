@@ -36,6 +36,8 @@ class LottoGetRes {
         accepted: json["accepted"],
       );
 
+  set lenth(int lenth) {}
+
   Map<String, dynamic> toJson() => {
         "lid": lid,
         "price": price,

@@ -1,6 +1,12 @@
+import 'dart:convert';
+import 'dart:developer';
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:miniprojectapp/config/config.dart';
 import 'package:miniprojectapp/page/login.dart';
+import 'package:http/http.dart' as http;
+import 'package:miniprojectapp/response/adminselotto_get_res.dart';
+import 'package:miniprojectapp/response/lotto_get_res.dart';
 
 class AdminPage extends StatefulWidget {
   const AdminPage({super.key});
@@ -10,6 +16,16 @@ class AdminPage extends StatefulWidget {
 }
 
 class _AdminPage extends State<AdminPage> {
+  late AdminGetLottoRes lenlotto;
+  late Future<void> loadData;
+  List<LottoGetRes> lottoGetRes = [];
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    loadData = loadDataAstnc();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -84,7 +100,17 @@ class _AdminPage extends State<AdminPage> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           _buildHeader(),
-          _buildStatistics(),
+          FutureBuilder(
+              future: loadData,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState != ConnectionState.done) {
+                  return const Center(
+                    child: CircularProgressIndicator(),
+                  );
+                }
+                return _buildStatistics(
+                    lenlotto.lenuser.toString(), lenlotto.lenall.toString());
+              }),
           _buildPrizeAnnouncement(),
           _buildResetButton()
         ],
@@ -106,14 +132,14 @@ class _AdminPage extends State<AdminPage> {
     );
   }
 
-  Widget _buildStatistics() {
+  Widget _buildStatistics(String lenuser, String lenall) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 30, 20, 0),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          _buildStatBox('สลากถูกซื้อไปแล้ว', ':\t999'),
-          _buildStatBox('สลากทั้งหมด', ':\t999'),
+          _buildStatBox('สลากถูกซื้อไปแล้ว', ':\t$lenuser'),
+          _buildStatBox('สลากทั้งหมด', ':\t$lenall'),
         ],
       ),
     );
@@ -146,11 +172,70 @@ class _AdminPage extends State<AdminPage> {
             ),
           ),
           const SizedBox(height: 5.0),
-          _buildPrizeRow('รางวัลที่ 1', '2000 บาท'),
-          _buildPrizeRow('รางวัลที่ 2', '1500 บาท'),
-          _buildPrizeRow('รางวัลที่ 3', '1000 บาท'),
-          _buildPrizeRow('รางวัลที่ 4', '500 บาท'),
-          _buildPrizeRow('รางวัลที่ 5', '250 บาท'),
+          FutureBuilder(
+            future: loadData,
+            builder: (context, snapshot) {
+              if (snapshot.connectionState != ConnectionState.done) {
+                return const Center(
+                  child: CircularProgressIndicator(),
+                );
+              }
+
+              if (snapshot.hasError) {
+                return Center(child: Text('เกิดข้อผิดพลาด: ${snapshot.error}'));
+              }
+              if (lottoGetRes == null || lottoGetRes.isEmpty) {
+                // หากไม่มีข้อมูล ให้แสดงรางวัลที่ 1 ถึง 5 พร้อมค่าเริ่มต้น
+                return Column(
+                  children: List.generate(5, (index) {
+                    // กำหนดข้อความรางวัลและจำนวนเงินตามลำดับ
+                    String prizeNumber = (index + 1).toString();
+                    String prizeText = '';
+                    if (prizeNumber == '1') {
+                      prizeText = '2000 บาท';
+                    } else if (prizeNumber == '2') {
+                      prizeText = '1500 บาท';
+                    } else if (prizeNumber == '3') {
+                      prizeText = '1000 บาท';
+                    } else if (prizeNumber == '4') {
+                      prizeText = '500 บาท';
+                    } else if (prizeNumber == '5') {
+                      prizeText = '250 บาท';
+                    }
+
+                    return _buildPrizeRow(
+                      'รางวัลที่ $prizeNumber',
+                      prizeText,
+                      _formatNumber('??????'), // ค่าเริ่มต้นของหมายเลข
+                    );
+                  }),
+                );
+              }
+              return Column(
+                children: lottoGetRes.map<Widget>(
+                  (lotto) {
+                    String prizeText = '';
+                    if (lotto.prize == '1') {
+                      prizeText = '2000 บาท';
+                    } else if (lotto.prize == '2') {
+                      prizeText = '1500 บาท';
+                    } else if (lotto.prize == '3') {
+                      prizeText = '1000 บาท';
+                    } else if (lotto.prize == '4') {
+                      prizeText = '500 บาท';
+                    } else if (lotto.prize == '5') {
+                      prizeText = '250 บาท';
+                    }
+                    return _buildPrizeRow(
+                      'รางวัลที่ ${lotto.prize}', // หรือใช้การจัดรูปแบบที่เหมาะสม
+                      prizeText,
+                      _formatNumber(lotto.number),
+                    );
+                  },
+                ).toList(),
+              );
+            },
+          ),
           SizedBox(height: 16),
           ElevatedButton(
               onPressed: () {
@@ -159,7 +244,10 @@ class _AdminPage extends State<AdminPage> {
                   builder: (BuildContext context) {
                     return RandomButton(
                       onClose: () {
-                        Navigator.of(context).pop(); // ปิด Dialog
+                        Navigator.of(context).pop(); // Close dialog
+                      },
+                      onRefresh: () {
+                        _handleRefresh();
                       },
                     );
                   },
@@ -186,7 +274,20 @@ class _AdminPage extends State<AdminPage> {
       ),
     );
   }
+
+  void _handleRefresh() {
+    // ดีเลย์การรีเฟรชข้อมูล 5 วินาที
+    Future.delayed(Duration(seconds: 1), () {
+      setState(() {
+        loadData = loadDataAstnc();
+      });
+    });
+  }
+
   //add reset system
+  String _formatNumber(String number) {
+    return number.split('').join(' ');
+  }
 
   Widget _buildResetButton() {
     return Center(
@@ -198,6 +299,9 @@ class _AdminPage extends State<AdminPage> {
               return ResetButtonn(
                 onClose: () {
                   Navigator.of(context).pop(); // ปิด Dialog
+                },
+                onRefresh: () {
+                  _handleRefresh();
                 },
               );
             },
@@ -285,26 +389,28 @@ class _AdminPage extends State<AdminPage> {
     );
   }
 
-  Widget _buildPrizeRow(String title, String amount) {
+  Widget _buildPrizeRow(String title, String amount, String number) {
+    List<String> numberList = number.split(' ');
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: Container(
         padding: const EdgeInsets.all(8.0),
         decoration: BoxDecoration(
-          color: const Color(0xff44CEA8),
+          color: const Color(0xff44CEA8), // Green color
           borderRadius: BorderRadius.circular(12.0),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.3),
-              offset: const Offset(0, 4),
-              blurRadius: 8.0,
-              spreadRadius: 0.0,
+              color: Colors.black.withOpacity(0.3), // Shadow color with opacity
+              offset: const Offset(0, 4), // Shadow offset (x, y)
+              blurRadius: 8.0, // Shadow blur radius
+              spreadRadius: 0.0, // Shadow spread radius
             ),
           ],
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
+            // Column for the title and amount
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -324,7 +430,9 @@ class _AdminPage extends State<AdminPage> {
                 ),
               ],
             ),
+            // Spacing between the text and the grey container
             const SizedBox(width: 10.0),
+            // Grey container taking up nearly the full width
             Expanded(
               child: Container(
                 padding: const EdgeInsets.symmetric(vertical: 8.0),
@@ -334,18 +442,18 @@ class _AdminPage extends State<AdminPage> {
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
-                  children: List.generate(6, (index) {
-                    return const Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 5.0),
+                  children: numberList.map((number) {
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 5.0),
                       child: Text(
-                        '0',
-                        style: TextStyle(
+                        number,
+                        style: const TextStyle(
                           fontSize: 20.0,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                     );
-                  }),
+                  }).toList(),
                 ),
               ),
             ),
@@ -368,13 +476,26 @@ class _AdminPage extends State<AdminPage> {
       ),
     );
   }
+
+  Future<void> loadDataAstnc() async {
+    // await Future.delayed(const Duration(seconds: 2), () => print("BBB"));
+    var value = await Configuration.getConfig();
+    String url = value['apiEndPoint'];
+
+    var json = await http.get(Uri.parse('$url/adminlotto/lotto'));
+    lenlotto = adminGetLottoResFromJson(json.body);
+
+    var jsonlotto = await http.get(Uri.parse('$url/lotto/seprize'));
+    lottoGetRes = lottoGetResFromJson(jsonlotto.body);
+  }
 }
 
 //============================================ S T A R T  F R O M  T H I S ================================
 class RandomButton extends StatefulWidget {
   final VoidCallback onClose;
-
-  const RandomButton({Key? key, required this.onClose}) : super(key: key);
+  final VoidCallback onRefresh;
+  const RandomButton({Key? key, required this.onClose, required this.onRefresh})
+      : super(key: key);
 
   @override
   _RandomButtonState createState() => _RandomButtonState();
@@ -500,7 +621,10 @@ class _RandomButtonState extends State<RandomButton> {
                   child: IconButton(
                     icon:
                         const Icon(Icons.check, color: Colors.white, size: 30),
-                    onPressed: () {},
+                    onPressed: () {
+                      check(context, _selectedCheckbox, widget.onRefresh);
+                      Navigator.of(context).pop();
+                    },
                   ),
                 ),
               ],
@@ -510,6 +634,198 @@ class _RandomButtonState extends State<RandomButton> {
         ),
       ),
     );
+  }
+
+  void check(BuildContext context, int se, VoidCallback onRefresh) async {
+    // แสดง Dialog ขณะกำลังดำเนินการ
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20.0),
+        ),
+        titlePadding: EdgeInsets.zero,
+        title: Container(
+          padding: const EdgeInsets.all(12.0),
+          decoration: const BoxDecoration(
+            color: Colors.purple,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(20.0)),
+          ),
+          child: const Text(
+            'กำลังดำเนินการ',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+              fontSize: 18,
+            ),
+          ),
+        ),
+        content: const Text(
+          'กรุณารอสักครู่...',
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            fontSize: 16,
+          ),
+        ),
+      ),
+    );
+
+    try {
+      // รับค่า Configuration
+      var value = await Configuration.getConfig();
+      String url = value['apiEndPoint'];
+
+      // เลือกเส้นที่เหมาะสมตามค่า se
+      String endpoint;
+      if (se == 1) {
+        endpoint = '/adminlotto/ranprizeuser'; // เส้นที่ 1
+      } else if (se == 0) {
+        endpoint = '/adminlotto/ranprizeall'; // เส้นที่ 2
+      } else {
+        throw Exception('Invalid value for se: $se');
+      }
+
+      // ส่งคำขอไปยัง API
+      var response = await http.get(Uri.parse('$url$endpoint'));
+
+      // ตรวจสอบสถานะการตอบสนอง
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        // สุ่มสำเร็จ
+        Navigator.pop(context); // ปิด Dialog
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (context) => AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20.0),
+            ),
+            titlePadding: EdgeInsets.zero,
+            title: Container(
+              padding: const EdgeInsets.all(12.0),
+              decoration: const BoxDecoration(
+                color: Colors.green,
+                borderRadius: BorderRadius.vertical(top: Radius.circular(20.0)),
+              ),
+              child: const Text(
+                'สำเร็จ',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                  fontSize: 18,
+                ),
+              ),
+            ),
+            content: const Text(
+              'สุ่มสำเร็จ',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 16,
+              ),
+            ),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context); // ปิด Dialog
+                  onRefresh(); // เรียกฟังก์ชันรีเฟรช
+                },
+                child: const Text('ตกลง'),
+              ),
+            ],
+          ),
+        );
+      } else {
+        // การตอบสนองไม่สำเร็จ
+        Navigator.pop(context); // ปิด Dialog
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (context) => AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20.0),
+            ),
+            titlePadding: EdgeInsets.zero,
+            title: Container(
+              padding: const EdgeInsets.all(12.0),
+              decoration: const BoxDecoration(
+                color: Colors.red,
+                borderRadius: BorderRadius.vertical(top: Radius.circular(20.0)),
+              ),
+              child: const Text(
+                'ข้อผิดพลาด',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                  fontSize: 18,
+                ),
+              ),
+            ),
+            content: const Text(
+              'Admin ได้ทำการสุ่มไปแล้วไม่สามารถสุ่มได้อีกนอกจากทาง Admin จะรีระบบ',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 16,
+              ),
+            ),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context); // ปิด Dialog
+                },
+                child: const Text('ตกลง'),
+              ),
+            ],
+          ),
+        );
+      }
+    } catch (e) {
+      // การจัดการข้อผิดพลาด
+      Navigator.pop(context); // ปิด Dialog
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20.0),
+          ),
+          titlePadding: EdgeInsets.zero,
+          title: Container(
+            padding: const EdgeInsets.all(12.0),
+            decoration: const BoxDecoration(
+              color: Colors.red,
+              borderRadius: BorderRadius.vertical(top: Radius.circular(20.0)),
+            ),
+            child: const Text(
+              'ข้อผิดพลาด',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+                fontSize: 18,
+              ),
+            ),
+          ),
+          content: Text(
+            'กรุณาเลือกระหว่าง สุ่มทั้งหมด หรือ สุ่มจากสลากที่ซื้อ',
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              fontSize: 16,
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context); // ปิด Dialog
+              },
+              child: const Text('ตกลง'),
+            ),
+          ],
+        ),
+      );
+    }
   }
 }
 
@@ -624,8 +940,9 @@ class _RandomButtonState extends State<RandomButton> {
 
 class ResetButtonn extends StatelessWidget {
   final VoidCallback onClose;
-
-  ResetButtonn({required this.onClose});
+  final VoidCallback onRefresh; // เพิ่มพารามิเตอร์นี้
+  ResetButtonn({required this.onClose, required this.onRefresh});
+  final TextEditingController _controller = TextEditingController();
   @override
   Widget build(BuildContext context) {
     return Dialog(
@@ -677,6 +994,7 @@ class ResetButtonn extends StatelessWidget {
                   ),
                   SizedBox(height: 10),
                   TextField(
+                    controller: _controller,
                     decoration: InputDecoration(
                       hintText: "ขั้นต่ำ 100",
                       border: UnderlineInputBorder(),
@@ -696,8 +1014,8 @@ class ResetButtonn extends StatelessWidget {
                       _buildActionButtonn(
                           Icons.close, Color(0xFFE74C3C), onClose),
                       _buildActionButtonn(Icons.check, Color(0xFF2ECC71), () {
+                        reset(context);
                         // เพิ่มการกระทำเมื่อกดปุ่มยืนยันที่นี่
-                        onClose(); // ปิด popup หลังจากยืนยัน
                       }),
                       SizedBox(
                         height: 10,
@@ -711,6 +1029,247 @@ class ResetButtonn extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  void reset(BuildContext context) async {
+    String amountString = _controller.text;
+    int? amount = int.tryParse(amountString);
+
+    if (amount == null) {
+      Navigator.pop(context); // ปิด Dialog
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20.0),
+          ),
+          titlePadding: EdgeInsets.zero,
+          title: Container(
+            padding: const EdgeInsets.all(12.0),
+            decoration: const BoxDecoration(
+              color: Colors.red,
+              borderRadius: BorderRadius.vertical(top: Radius.circular(20.0)),
+            ),
+            child: const Text(
+              'ข้อผิดพลาด',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+                fontSize: 18,
+              ),
+            ),
+          ),
+          content: const Text(
+            'กรุณากรอกจำนวนที่ถูกต้อง',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 16,
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context); // ปิด Dialog
+              },
+              child: const Text('ตกลง'),
+            ),
+          ],
+        ),
+      );
+      return;
+    }
+
+    if (amount < 100) {
+      Navigator.pop(context); // ปิด Dialog
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20.0),
+          ),
+          titlePadding: EdgeInsets.zero,
+          title: Container(
+            padding: const EdgeInsets.all(12.0),
+            decoration: const BoxDecoration(
+              color: Colors.red,
+              borderRadius: BorderRadius.vertical(top: Radius.circular(20.0)),
+            ),
+            child: const Text(
+              'ข้อผิดพลาด',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+                fontSize: 18,
+              ),
+            ),
+          ),
+          content: const Text(
+            'กรุณาใส่จำนวนที่มากว่า 100',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 16,
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context); // ปิด Dialog
+              },
+              child: const Text('ตกลง'),
+            ),
+          ],
+        ),
+      );
+      return;
+    } else {
+      try {
+        var value = await Configuration.getConfig();
+        String url = value['apiEndPoint'];
+        var response =
+            await http.get(Uri.parse('$url/adminlotto/randomlotto/$amount'));
+        log('จำนวนเงินถูกต้อง');
+        if (response.statusCode == 200 || response.statusCode == 201) {
+          // สุ่มสำเร็จ
+          Navigator.pop(context); // ปิด Dialog
+          showDialog(
+            context: context,
+            barrierDismissible: false,
+            builder: (context) => AlertDialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20.0),
+              ),
+              titlePadding: EdgeInsets.zero,
+              title: Container(
+                padding: const EdgeInsets.all(12.0),
+                decoration: const BoxDecoration(
+                  color: Colors.green,
+                  borderRadius:
+                      BorderRadius.vertical(top: Radius.circular(20.0)),
+                ),
+                child: const Text(
+                  'สำเร็จ',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                    fontSize: 18,
+                  ),
+                ),
+              ),
+              content: const Text(
+                'ทำการรีเซ็ตระบบสำเร็จ',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 16,
+                ),
+              ),
+              actions: <Widget>[
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(context); // ปิด Dialog
+                    onRefresh(); // เรียกฟังก์ชันรีเฟรช
+                  },
+                  child: const Text('ตกลง'),
+                ),
+              ],
+            ),
+          );
+        } else {
+          // การตอบสนองไม่สำเร็จ
+          Navigator.pop(context); // ปิด Dialog
+          showDialog(
+            context: context,
+            barrierDismissible: false,
+            builder: (context) => AlertDialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20.0),
+              ),
+              titlePadding: EdgeInsets.zero,
+              title: Container(
+                padding: const EdgeInsets.all(12.0),
+                decoration: const BoxDecoration(
+                  color: Colors.red,
+                  borderRadius:
+                      BorderRadius.vertical(top: Radius.circular(20.0)),
+                ),
+                child: const Text(
+                  'ข้อผิดพลาด',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                    fontSize: 18,
+                  ),
+                ),
+              ),
+              content: const Text(
+                'Admin ได้ทำการรีระบบไปแล้วรอออกรางวัลก่อนจึงจะรีระบบได้',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 16,
+                ),
+              ),
+              actions: <Widget>[
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(context); // ปิด Dialog
+                  },
+                  child: const Text('ตกลง'),
+                ),
+              ],
+            ),
+          );
+        }
+      } catch (e) {
+        // การจัดการข้อผิดพลาด
+        Navigator.pop(context); // ปิด Dialog
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (context) => AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20.0),
+            ),
+            titlePadding: EdgeInsets.zero,
+            title: Container(
+              padding: const EdgeInsets.all(12.0),
+              decoration: const BoxDecoration(
+                color: Colors.red,
+                borderRadius: BorderRadius.vertical(top: Radius.circular(20.0)),
+              ),
+              child: const Text(
+                'ข้อผิดพลาด',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                  fontSize: 18,
+                ),
+              ),
+            ),
+            content: Text(
+              'ERROR DATABASE',
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                fontSize: 16,
+              ),
+            ),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context); // ปิด Dialog
+                },
+                child: const Text('ตกลง'),
+              ),
+            ],
+          ),
+        );
+      }
+    }
   }
 
   Widget _buildActionButtonn(

@@ -1,10 +1,13 @@
 import 'dart:developer';
 import 'dart:ui'; // Import for the BackdropFilter
 import 'package:flutter/material.dart';
+import 'package:miniprojectapp/config/config.dart';
 import 'package:miniprojectapp/page/Widget.dart';
 import 'package:miniprojectapp/page/lotto.dart';
 import 'package:miniprojectapp/page/user.dart';
 import 'package:miniprojectapp/page/wallet.dart';
+import 'package:http/http.dart' as http;
+import 'package:miniprojectapp/response/lotto_get_res.dart';
 
 class HomePage extends StatefulWidget {
   int uid = 0;
@@ -16,12 +19,14 @@ class HomePage extends StatefulWidget {
 
 class _HomePage extends State<HomePage> {
   String activePage = 'home'; // State variable to track the active page
-
+  List<LottoGetRes> lottoGetRes = [];
+  late Future<void> loadData;
   @override
   void initState() {
     // TODO: implement initState
     log(widget.uid.toString());
     super.initState();
+    loadData = loadDataAstnc();
   }
 
   @override
@@ -113,11 +118,71 @@ class _HomePage extends State<HomePage> {
                     ),
                   ),
                   const SizedBox(height: 16.0),
-                  _buildPrizeRow('รางวัลที่ 1', '2000 บาท'),
-                  _buildPrizeRow('รางวัลที่ 2', '1500 บาท'),
-                  _buildPrizeRow('รางวัลที่ 3', '1000 บาท'),
-                  _buildPrizeRow('รางวัลที่ 4', '500 บาท'),
-                  _buildPrizeRow('รางวัลที่ 5', '250 บาท'),
+                  FutureBuilder(
+                    future: loadData,
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState != ConnectionState.done) {
+                        return const Center(
+                          child: CircularProgressIndicator(),
+                        );
+                      }
+
+                      if (snapshot.hasError) {
+                        return Center(
+                            child: Text('เกิดข้อผิดพลาด: ${snapshot.error}'));
+                      }
+                      if (lottoGetRes == null || lottoGetRes.isEmpty) {
+                        // หากไม่มีข้อมูล ให้แสดงรางวัลที่ 1 ถึง 5 พร้อมค่าเริ่มต้น
+                        return Column(
+                          children: List.generate(5, (index) {
+                            // กำหนดข้อความรางวัลและจำนวนเงินตามลำดับ
+                            String prizeNumber = (index + 1).toString();
+                            String prizeText = '';
+                            if (prizeNumber == '1') {
+                              prizeText = '2000 บาท';
+                            } else if (prizeNumber == '2') {
+                              prizeText = '1500 บาท';
+                            } else if (prizeNumber == '3') {
+                              prizeText = '1000 บาท';
+                            } else if (prizeNumber == '4') {
+                              prizeText = '500 บาท';
+                            } else if (prizeNumber == '5') {
+                              prizeText = '250 บาท';
+                            }
+
+                            return _buildPrizeRow(
+                              'รางวัลที่ $prizeNumber',
+                              prizeText,
+                              _formatNumber('??????'), // ค่าเริ่มต้นของหมายเลข
+                            );
+                          }),
+                        );
+                      }
+                      return Column(
+                        children: lottoGetRes.map<Widget>(
+                          (lotto) {
+                            String prizeText = '';
+                            if (lotto.prize == '1') {
+                              prizeText = '2000 บาท';
+                            } else if (lotto.prize == '2') {
+                              prizeText = '1500 บาท';
+                            } else if (lotto.prize == '3') {
+                              prizeText = '1000 บาท';
+                            } else if (lotto.prize == '4') {
+                              prizeText = '500 บาท';
+                            } else if (lotto.prize == '5') {
+                              prizeText = '250 บาท';
+                            }
+                            return _buildPrizeRow(
+                              'รางวัลที่ ${lotto.prize}', // หรือใช้การจัดรูปแบบที่เหมาะสม
+                              prizeText,
+                              _formatNumber(lotto.number),
+                            );
+                          },
+                        ).toList(),
+                      );
+                    },
+                  )
                 ],
               ),
             ),
@@ -154,6 +219,10 @@ class _HomePage extends State<HomePage> {
     );
   }
 
+  String _formatNumber(String number) {
+    return number.split('').join(' ');
+  }
+
   Widget _buildNavItem(String assetPath, String label,
       {bool isActive = false, VoidCallback? onPressed}) {
     return GestureDetector(
@@ -177,7 +246,7 @@ class _HomePage extends State<HomePage> {
           const SizedBox(height: 4), // Spacing between icon and text
           Text(
             label,
-            style: TextStyle(
+            style: const TextStyle(
               color: Colors.white,
               fontSize: 15, // Adjust font size as needed
             ),
@@ -187,7 +256,8 @@ class _HomePage extends State<HomePage> {
     );
   }
 
-  Widget _buildPrizeRow(String title, String amount) {
+  Widget _buildPrizeRow(String title, String amount, String number) {
+    List<String> numberList = number.split(' ');
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: Container(
@@ -239,18 +309,18 @@ class _HomePage extends State<HomePage> {
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
-                  children: List.generate(6, (index) {
-                    return const Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 5.0),
+                  children: numberList.map((number) {
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 5.0),
                       child: Text(
-                        '0',
-                        style: TextStyle(
+                        number,
+                        style: const TextStyle(
                           fontSize: 20.0,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                     );
-                  }),
+                  }).toList(),
                 ),
               ),
             ),
@@ -258,5 +328,14 @@ class _HomePage extends State<HomePage> {
         ),
       ),
     );
+  }
+
+  Future<void> loadDataAstnc() async {
+    // await Future.delayed(const Duration(seconds: 2), () => print("BBB"));
+    var value = await Configuration.getConfig();
+    String url = value['apiEndPoint'];
+
+    var json = await http.get(Uri.parse('$url/lotto/seprize'));
+    lottoGetRes = lottoGetResFromJson(json.body);
   }
 }

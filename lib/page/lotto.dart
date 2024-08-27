@@ -433,26 +433,38 @@ class _LottoPurchasePageState extends State<LottoPage> {
                   // Display the selected Lotto numbers and purchase options
                   Expanded(
                     child: FutureBuilder(
-                        future: loadData,
-                        builder: (context, snapshot) {
-                          if (snapshot.connectionState !=
-                              ConnectionState.done) {
-                            return const Center(
-                              child: CircularProgressIndicator(),
-                            );
-                          }
-                          return ListView(
-                            padding: EdgeInsets.only(bottom: 100),
-                            children: lottoGetRes
-                                .map(
-                                  (lotto) => _buildLotteryCard(
-                                      _formatNumber(lotto.number),
-                                      lotto.price,
-                                      lotto.lid),
-                                )
-                                .toList(),
+                      future: loadData,
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState != ConnectionState.done) {
+                          return const Center(
+                            child: CircularProgressIndicator(),
                           );
-                        }),
+                        }
+
+                        if (lottoGetRes.isEmpty) {
+                          return const Center(
+                            child: Text(
+                              'รางวัลออกแล้วรอการรีเซ็ตใหม่',
+                              style: TextStyle(
+                                  fontSize: 18, color: Colors.black54),
+                            ),
+                          );
+                        }
+
+                        return ListView(
+                          padding: EdgeInsets.only(bottom: 100),
+                          children: lottoGetRes
+                              .map(
+                                (lotto) => _buildLotteryCard(
+                                  _formatNumber(lotto.number),
+                                  lotto.price,
+                                  lotto.lid,
+                                ),
+                              )
+                              .toList(),
+                        );
+                      },
+                    ),
                   ),
                 ],
               ),
