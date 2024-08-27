@@ -513,114 +513,114 @@ class _RandomButtonState extends State<RandomButton> {
   }
 }
 
-class PopupButton extends StatelessWidget {
-  final VoidCallback onClose;
+// class PopupButton extends StatelessWidget {
+//   final VoidCallback onClose;
 
-  PopupButton({required this.onClose});
-  @override
-  Widget build(BuildContext context) {
-    return Dialog(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(20),
-      ),
-      elevation: 0,
-      backgroundColor: Colors.transparent,
-      child: Container(
-        width: 300,
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(20),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.1),
-              spreadRadius: 1,
-              blurRadius: 5,
-              offset: Offset(0, 2),
-            ),
-          ],
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.symmetric(vertical: 15),
-              decoration: BoxDecoration(
-                color: Color(0xFF8E44AD), // Purple color from the image
-                borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-              ),
-              child: Text(
-                'รีเซ็ตระบบใหม่',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                children: [
-                  Text(
-                    'สร้างสลากจำนวน:',
-                    style: TextStyle(fontSize: 16),
-                  ),
-                  SizedBox(height: 10),
-                  TextField(
-                    decoration: InputDecoration(
-                      hintText: "ขั้นต่ำ 100",
-                      border: UnderlineInputBorder(),
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  SizedBox(height: 20),
-                  Text(
-                    'การรีเซ็ตระบบใหม่จะทำให้ข้อมูล\nลูกค้าและสลากหายทั้งหมด\nคุณแน่ใจหรือไม่?',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(color: Colors.red, fontSize: 14),
-                  ),
-                  SizedBox(height: 20),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      _buildActionButton(
-                          Icons.close, Color(0xFFE74C3C), onClose),
-                      _buildActionButton(Icons.check, Color(0xFF2ECC71), () {
-                        // เพิ่มการกระทำเมื่อกดปุ่มยืนยันที่นี่
-                        onClose(); // ปิด popup หลังจากยืนยัน
-                      }),
-                      SizedBox(
-                        height: 10,
-                      )
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+//   PopupButton({required this.onClose});
+//   @override
+//   Widget build(BuildContext context) {
+//     return Dialog(
+//       shape: RoundedRectangleBorder(
+//         borderRadius: BorderRadius.circular(20),
+//       ),
+//       elevation: 0,
+//       backgroundColor: Colors.transparent,
+//       child: Container(
+//         width: 300,
+//         decoration: BoxDecoration(
+//           color: Colors.white,
+//           borderRadius: BorderRadius.circular(20),
+//           boxShadow: [
+//             BoxShadow(
+//               color: Colors.black.withOpacity(0.1),
+//               spreadRadius: 1,
+//               blurRadius: 5,
+//               offset: Offset(0, 2),
+//             ),
+//           ],
+//         ),
+//         child: Column(
+//           mainAxisSize: MainAxisSize.min,
+//           children: [
+//             Container(
+//               width: double.infinity,
+//               padding: const EdgeInsets.symmetric(vertical: 15),
+//               decoration: BoxDecoration(
+//                 color: Color(0xFF8E44AD), // Purple color from the image
+//                 borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+//               ),
+//               child: Text(
+//                 'รีเซ็ตระบบใหม่',
+//                 textAlign: TextAlign.center,
+//                 style: TextStyle(
+//                     color: Colors.white,
+//                     fontSize: 18,
+//                     fontWeight: FontWeight.bold),
+//               ),
+//             ),
+//             Padding(
+//               padding: const EdgeInsets.all(20),
+//               child: Column(
+//                 children: [
+//                   Text(
+//                     'สร้างสลากจำนวน:',
+//                     style: TextStyle(fontSize: 16),
+//                   ),
+//                   SizedBox(height: 10),
+//                   TextField(
+//                     decoration: InputDecoration(
+//                       hintText: "ขั้นต่ำ 100",
+//                       border: UnderlineInputBorder(),
+//                     ),
+//                     textAlign: TextAlign.center,
+//                   ),
+//                   SizedBox(height: 20),
+//                   Text(
+//                     'การรีเซ็ตระบบใหม่จะทำให้ข้อมูล\nลูกค้าและสลากหายทั้งหมด\nคุณแน่ใจหรือไม่?',
+//                     textAlign: TextAlign.center,
+//                     style: TextStyle(color: Colors.red, fontSize: 14),
+//                   ),
+//                   SizedBox(height: 20),
+//                   Row(
+//                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+//                     children: [
+//                       _buildActionButton(
+//                           Icons.close, Color(0xFFE74C3C), onClose),
+//                       _buildActionButton(Icons.check, Color(0xFF2ECC71), () {
+//                         // เพิ่มการกระทำเมื่อกดปุ่มยืนยันที่นี่
+//                         onClose(); // ปิด popup หลังจากยืนยัน
+//                       }),
+//                       SizedBox(
+//                         height: 10,
+//                       )
+//                     ],
+//                   ),
+//                 ],
+//               ),
+//             ),
+//           ],
+//         ),
+//       ),
+//     );
+//   }
 
-  Widget _buildActionButton(
-      IconData icon, Color color, VoidCallback onPressed) {
-    return Container(
-      decoration: BoxDecoration(
-          color: Colors.green[400], // สีพื้นหลังที่ต้องการ
-          borderRadius:
-              BorderRadius.circular(20) // รูปทรง (ใช้ Circle เพื่อให้เป็นวงกลม)
-          // รูปทรง (ใช้ Circle เพื่อให้เป็นวงกลม)
-          ),
-      width: 75,
-      child: IconButton(
-        icon: Icon(icon, color: Colors.white),
-        onPressed: onPressed,
-      ),
-    );
-  }
-}
+//   Widget _buildActionButton(
+//       IconData icon, Color color, VoidCallback onPressed) {
+//     return Container(
+//       decoration: BoxDecoration(
+//           color: Colors.green[400], // สีพื้นหลังที่ต้องการ
+//           borderRadius:
+//               BorderRadius.circular(20) // รูปทรง (ใช้ Circle เพื่อให้เป็นวงกลม)
+//           // รูปทรง (ใช้ Circle เพื่อให้เป็นวงกลม)
+//           ),
+//       width: 75,
+//       child: IconButton(
+//         icon: Icon(icon, color: Colors.white),
+//         onPressed: onPressed,
+//       ),
+//     );
+//   }
+// }
 
 class ResetButtonn extends StatelessWidget {
   final VoidCallback onClose;
