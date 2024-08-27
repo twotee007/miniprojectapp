@@ -555,14 +555,55 @@ class _WalletPageState extends State<WalletPage> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('รับรางวัล'),
-          content: const Text('คุณได้คลิกเพื่อรับรางวัลแล้ว!'),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20.0),
+          ),
+          titlePadding: EdgeInsets.zero,
+          title: Container(
+            padding: const EdgeInsets.all(12.0),
+            decoration: const BoxDecoration(
+              color: Color.fromARGB(
+                  255, 76, 175, 80), // A green color indicating success
+              borderRadius: BorderRadius.vertical(top: Radius.circular(20.0)),
+            ),
+            child: const Text(
+              'รับรางวัล',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+                fontSize: 18,
+              ),
+            ),
+          ),
+          contentPadding: const EdgeInsets.all(16.0),
+          content: const Text(
+            'คุณได้คลิกเพื่อรับรางวัลแล้ว!',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 16,
+              color: Colors.black87,
+            ),
+          ),
+          actionsPadding: const EdgeInsets.only(bottom: 8.0),
           actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: const Text('ตกลง'),
+            Center(
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color.fromARGB(
+                      255, 76, 175, 80), // Matching the title color
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 24.0, vertical: 8.0),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8.0),
+                  ),
+                ),
+                onPressed: () {
+                  Navigator.of(context).pop(); // Close the dialog
+                },
+                child:
+                    const Text('ตกลง', style: TextStyle(color: Colors.white)),
+              ),
             ),
           ],
         );

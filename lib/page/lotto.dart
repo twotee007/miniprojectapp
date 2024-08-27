@@ -868,20 +868,58 @@ class _LottoPurchasePageState extends State<LottoPage> {
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(20.0),
               ),
-              title: const Text('ข้อผิดพลาด', textAlign: TextAlign.center),
+              titlePadding: EdgeInsets.zero,
+              title: Container(
+                padding: const EdgeInsets.all(12.0),
+                decoration: const BoxDecoration(
+                  color: Color.fromARGB(255, 199, 91,
+                      84), // Customize this color for error indication
+                  borderRadius:
+                      BorderRadius.vertical(top: Radius.circular(20.0)),
+                ),
+                child: const Text(
+                  'ข้อผิดพลาด',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                    fontSize: 18,
+                  ),
+                ),
+              ),
+              contentPadding: const EdgeInsets.all(16.0),
               content: Text(
-                  'ลูกค้ายอดเงินไม่พอกรุณารอรางวัลออกแล้วลุ้นนะครับ: ${res.statusCode}',
-                  textAlign: TextAlign.center),
+                'ยอดเงินของท่านไม่เพียงพอ',
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  fontSize: 16,
+                  color: Colors.black87,
+                ),
+              ),
+              actionsPadding: const EdgeInsets.only(bottom: 8.0),
               actions: [
-                TextButton(
-                  onPressed: () {
-                    Navigator.pop(context); // Close the error dialog
-                  },
-                  child: const Text('ปิด'),
+                Center(
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color.fromARGB(255, 199, 91,
+                          84), // Same color as title background for consistency
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 24.0, vertical: 8.0),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8.0),
+                      ),
+                    ),
+                    onPressed: () {
+                      Navigator.pop(context); // Close the error dialog
+                    },
+                    child: const Text('ปิด',
+                        style: TextStyle(color: Colors.white)),
+                  ),
                 ),
               ],
             ),
           );
+
           log('Error purchasing lottery: ${res.statusCode}');
         }
       } catch (err) {
