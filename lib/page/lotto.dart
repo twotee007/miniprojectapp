@@ -93,7 +93,7 @@ class _LottoPurchasePageState extends State<LottoPage> {
         } else {
           log('No results found');
           setState(() {
-            searchMessage = 'ไม่พบเลขที่ท่านต้องการ';
+            searchMessage = 'โปรดค้นหาใหม่';
           });
         }
         if (numbersearch == '______') {
@@ -441,18 +441,49 @@ class _LottoPurchasePageState extends State<LottoPage> {
                           );
                         }
 
-                        if (lottoGetRes.isEmpty) {
-                          return const Center(
+                        if (snapshot.hasError) {
+                          return Center(
                             child: Text(
-                              'รางวัลออกแล้วรอการรีเซ็ตใหม่',
+                              'เกิดข้อผิดพลาดในการโหลดข้อมูล',
                               style: TextStyle(
-                                  fontSize: 18, color: Colors.black54),
+                                fontSize: 18,
+                                color: Colors.red,
+                              ),
                             ),
                           );
                         }
 
+                        // Check if the data is empty
+                        if (lottoGetRes.isEmpty) {
+                          // Show the appropriate message based on whether a search was performed or not
+                          if (searchMessage == 'ทั้งหมด') {
+                            // No data available in the system
+                            return const Center(
+                              child: Text(
+                                'รางวัลออกแล้วรอการรีเซ็ตใหม่',
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  color: Colors.black54,
+                                ),
+                              ),
+                            );
+                          } else {
+                            // Data is empty but a search was performed
+                            return Center(
+                              child: Text(
+                                'ไม่พบเลขที่ท่านต้องการ',
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  color: Colors.black54,
+                                ),
+                              ),
+                            );
+                          }
+                        }
+
+                        // If there are results, display them
                         return ListView(
-                          padding: EdgeInsets.only(bottom: 100),
+                          padding: const EdgeInsets.only(bottom: 100),
                           children: lottoGetRes
                               .map(
                                 (lotto) => _buildLotteryCard(
@@ -465,11 +496,12 @@ class _LottoPurchasePageState extends State<LottoPage> {
                         );
                       },
                     ),
-                  ),
+                  )
                 ],
               ),
             ),
           ),
+
           // Bottom Navigation Bar
           Positioned(
             bottom: 0,

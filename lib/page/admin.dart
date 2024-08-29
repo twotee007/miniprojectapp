@@ -30,7 +30,7 @@ class _AdminPage extends State<AdminPage> {
   Widget build(BuildContext context) {
     final Size screenSize = MediaQuery.of(context).size;
 
-        return Scaffold(
+    return Scaffold(
       body: LayoutBuilder(
         builder: (BuildContext context, BoxConstraints constraints) {
           return Stack(
@@ -138,7 +138,10 @@ class _AdminPage extends State<AdminPage> {
     );
   }
 
-  Widget _buildStatistics(String lenuser, String lenall,) {
+  Widget _buildStatistics(
+    String lenuser,
+    String lenall,
+  ) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 30, 20, 0),
       child: Row(
@@ -284,7 +287,7 @@ class _AdminPage extends State<AdminPage> {
 
   void _handleRefresh() {
     // ดีเลย์การรีเฟรชข้อมูล 5 วินาที
-    Future.delayed(Duration(seconds: 1), () {
+    Future.delayed(Duration(seconds: 2), () {
       setState(() {
         loadData = loadDataAstnc();
       });
@@ -772,7 +775,7 @@ class _RandomButtonState extends State<RandomButton> {
               ),
             ),
             content: const Text(
-              'Admin ได้ทำการสุ่มไปแล้วไม่สามารถสุ่มได้อีกนอกจากทาง Admin จะรีระบบ',
+              'เเอดมินได้ทำการสุ่มไปแล้วหรือสลากขายออกไม่ครบ5ใบ',
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 16,
@@ -895,7 +898,11 @@ class ResetButtonn extends StatelessWidget {
                   TextField(
                     controller: _controller,
                     decoration: InputDecoration(
-                      hintText: "ขั้นต่ำ 100",
+                      hintText: "ขั้นต่ำ 100 ใบ",
+                      hintStyle: TextStyle(
+                        color: Colors.grey, // สีจางสำหรับข้อความ
+                        fontWeight: FontWeight.w300, // น้ำหนักตัวอักษรจาง
+                      ),
                       border: UnderlineInputBorder(),
                     ),
                     textAlign: TextAlign.center,
@@ -1031,7 +1038,7 @@ class ResetButtonn extends StatelessWidget {
         String url = value['apiEndPoint'];
         var response =
             await http.get(Uri.parse('$url/adminlotto/randomlotto/$amount'));
-        log('จำนวนเงินถูกต้อง');
+        log('จำนวนสลาก $amount ใบ');
         if (response.statusCode == 200 || response.statusCode == 201) {
           // สุ่มสำเร็จ
           Navigator.pop(context); // ปิด Dialog

@@ -202,6 +202,16 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   void login() async {
+    showDialog(
+      context: context,
+      barrierDismissible: false, // ป้องกันไม่ให้ปิดป๊อปอัปด้วยการแตะที่ด้านนอก
+      builder: (BuildContext context) {
+        return const Center(
+          child: CircularProgressIndicator(), // Spinner แสดงสถานะการโหลด
+        );
+      },
+    );
+
     var model = UserPostReq(
       username: usernameController.text,
       password: passwordController.text,
@@ -218,11 +228,11 @@ class _LoginPageState extends State<LoginPage> {
       log('Response body: ${response.body}');
 
       if (response.statusCode >= 200 && response.statusCode < 300) {
-        // บันทึกว่าการตอบสนองเป็นรหัสสถานะที่แสดงว่ามีความสำเร็จ
         List<UserPostRes> users = userPostResFromJson(response.body);
 
         if (users.isNotEmpty) {
-          // Navigate to HomePage on successful login
+          Navigator.pop(context); // ปิดป๊อปอัปเมื่อการเข้าสู่ระบบสำเร็จ
+
           if (users[0].type == "user") {
             Navigator.pushReplacement(
               context,
@@ -242,16 +252,19 @@ class _LoginPageState extends State<LoginPage> {
             );
           }
         } else {
+          Navigator.pop(context); // ปิดป๊อปอัปเมื่อไม่พบข้อมูลผู้ใช้
           setState(() {
             text = "No user data found";
           });
         }
       } else {
+        Navigator.pop(context); // ปิดป๊อปอัปเมื่อการเข้าสู่ระบบไม่สำเร็จ
         setState(() {
           text = "Username or Password Incorrect";
         });
       }
     } catch (err) {
+      Navigator.pop(context); // ปิดป๊อปอัปเมื่อเกิดข้อผิดพลาด
       log(err.toString());
       setState(() {
         text = "An error occurred. Please try again.";
