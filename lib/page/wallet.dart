@@ -607,6 +607,12 @@ class _WalletPageState extends State<WalletPage> {
       Navigator.pop(context); // ปิด Dialog รอการดำเนินการ
 
       if (res.statusCode == 201 || res.statusCode == 200) {
+        setState(() {
+          // ลบสลากที่ได้รับรางวัลออกจากรายการ
+          lottoGetResUser.removeWhere((item) => item.lid == lid);
+          // โหลดข้อมูลใหม่ หรืออัปเดต UI
+          loadData = loadDataAstnc();
+        });
         // แสดง Dialog สำเร็จ
         showDialog(
           context: context,
