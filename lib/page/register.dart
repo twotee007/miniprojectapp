@@ -380,19 +380,45 @@ class _registerPageState extends State<registerPage> {
           img:
               "https://e7.pngegg.com/pngimages/340/946/png-clipart-avatar-user-computer-icons-software-developer-avatar-child-face-thumbnail.png");
       http
-          .post(Uri.parse('$url/users/adduser'),
-              headers: {"Content-Type": "application/json; charset=utf-8"},
-              body: registerPostReqToJson(model))
-          .then(
-        (value) {
-          log(value.body);
+          .post(
+        Uri.parse('$url/users/adduser'),
+        headers: {"Content-Type": "application/json; charset=utf-8"},
+        body: registerPostReqToJson(model),
+      )
+          .then((response) {
+        if (response.statusCode == 201) {
+          // Registration successful
           Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const LoginPage(),
-              ));
-        },
-      ).catchError((err) {
+            context,
+            MaterialPageRoute(
+              builder: (context) => const LoginPage(),
+            ),
+          );
+        } else if (response.statusCode == 409) {
+          // User already exists (HTTP status 409 Conflict)
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: const Text('การลงทะเบียนล้มเหลว'),
+                content: const Text(
+                    'ชื่อผู้ใช้นี้มีอยู่แล้วในระบบ กรุณาใช้ชื่อผู้ใช้อื่น.'),
+                actions: <Widget>[
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: const Text('ตกลง'),
+                  ),
+                ],
+              );
+            },
+          );
+        } else {
+          // Handle other status codes
+          log('Error: ${response.statusCode}');
+        }
+      }).catchError((err) {
         log(err.toString());
       });
     }
