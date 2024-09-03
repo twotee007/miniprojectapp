@@ -2,11 +2,11 @@ import 'dart:convert';
 import 'dart:developer';
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:miniprojectapp/config/config.dart';
-import 'package:miniprojectapp/page/login.dart';
+import 'package:LOTTO168/config/config.dart';
+import 'package:LOTTO168/page/login.dart';
 import 'package:http/http.dart' as http;
-import 'package:miniprojectapp/response/adminselotto_get_res.dart';
-import 'package:miniprojectapp/response/lotto_get_res.dart';
+import 'package:LOTTO168/response/adminselotto_get_res.dart';
+import 'package:LOTTO168/response/lotto_get_res.dart';
 
 class AdminPage extends StatefulWidget {
   const AdminPage({super.key});

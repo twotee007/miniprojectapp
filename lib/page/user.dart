@@ -2,14 +2,14 @@ import 'dart:developer';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
-import 'package:miniprojectapp/config/config.dart';
-import 'package:miniprojectapp/page/Widget.dart';
-import 'package:miniprojectapp/page/home.dart';
-import 'package:miniprojectapp/page/login.dart';
-import 'package:miniprojectapp/page/lotto.dart';
-import 'package:miniprojectapp/page/wallet.dart';
+import 'package:LOTTO168/config/config.dart';
+import 'package:LOTTO168/page/Widget.dart';
+import 'package:LOTTO168/page/home.dart';
+import 'package:LOTTO168/page/login.dart';
+import 'package:LOTTO168/page/lotto.dart';
+import 'package:LOTTO168/page/wallet.dart';
 import 'package:http/http.dart' as http;
-import 'package:miniprojectapp/response/useruid_get_res.dart';
+import 'package:LOTTO168/response/useruid_get_res.dart';
 
 class UserPage extends StatefulWidget {
   int uid = 0;

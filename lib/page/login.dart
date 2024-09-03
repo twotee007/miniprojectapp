@@ -2,11 +2,11 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart'; // Import for TapGestureRecognizer
-import 'package:miniprojectapp/config/config.dart';
-import 'package:miniprojectapp/page/admin.dart';
-import 'package:miniprojectapp/page/home.dart';
-import 'package:miniprojectapp/request/user_post_req.dart';
-import 'package:miniprojectapp/response/user_post_res.dart';
+import 'package:LOTTO168/config/config.dart';
+import 'package:LOTTO168/page/admin.dart';
+import 'package:LOTTO168/page/home.dart';
+import 'package:LOTTO168/request/user_post_req.dart';
+import 'package:LOTTO168/response/user_post_res.dart';
 import 'register.dart'; // Import your register page
 import 'package:http/http.dart' as http;
 

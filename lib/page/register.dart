@@ -3,9 +3,9 @@ import 'dart:developer';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:miniprojectapp/config/config.dart';
-import 'package:miniprojectapp/page/login.dart';
-import 'package:miniprojectapp/request/register_post_req.dart';
+import 'package:LOTTO168/config/config.dart';
+import 'package:LOTTO168/page/login.dart';
+import 'package:LOTTO168/request/register_post_req.dart';
 import 'package:http/http.dart' as http;
 
 class registerPage extends StatefulWidget {

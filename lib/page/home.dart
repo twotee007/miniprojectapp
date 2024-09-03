@@ -1,13 +1,13 @@
 import 'dart:developer';
 import 'dart:ui'; // Import for the BackdropFilter
 import 'package:flutter/material.dart';
-import 'package:miniprojectapp/config/config.dart';
-import 'package:miniprojectapp/page/Widget.dart';
-import 'package:miniprojectapp/page/lotto.dart';
-import 'package:miniprojectapp/page/user.dart';
-import 'package:miniprojectapp/page/wallet.dart';
+import 'package:LOTTO168/config/config.dart';
+import 'package:LOTTO168/page/Widget.dart';
+import 'package:LOTTO168/page/lotto.dart';
+import 'package:LOTTO168/page/user.dart';
+import 'package:LOTTO168/page/wallet.dart';
 import 'package:http/http.dart' as http;
-import 'package:miniprojectapp/response/lotto_get_res.dart';
+import 'package:LOTTO168/response/lotto_get_res.dart';
 
 class HomePage extends StatefulWidget {
   int uid = 0;
