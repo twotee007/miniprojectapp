@@ -101,26 +101,32 @@ class _AdminPage extends State<AdminPage> {
 
   // 2. เนื้อหาหลัก
   Widget _buildMainContent(Size screenSize, BoxConstraints constraints) {
-    return SingleChildScrollView(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          _buildHeader(),
-          FutureBuilder(
-              future: loadData,
-              builder: (context, snapshot) {
-                if (snapshot.connectionState != ConnectionState.done) {
-                  return const Center(
-                    child: CircularProgressIndicator(),
-                  );
-                }
-                return _buildStatistics(
-                    lenlotto.lenuser.toString(), lenlotto.lenall.toString());
-              }),
-          _buildPrizeAnnouncement(),
-          _buildResetButton()
-        ],
-      ),
+    return Stack(
+      children: [
+        SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              _buildHeader(),
+              FutureBuilder(
+                  future: loadData,
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState != ConnectionState.done) {
+                      return const Center(
+                        child: CircularProgressIndicator(),
+                      );
+                    }
+                    return _buildStatistics(lenlotto.lenuser.toString(),
+                        lenlotto.lenall.toString());
+                  }),
+              _buildPrizeAnnouncement(),
+              _buildResetButton(),
+              SizedBox(height: screenSize.height * 0.1), // To avoid overlapping
+            ],
+          ),
+        ),
+        _buildBottomNavigationBar(screenSize), // Bottom navigation bar
+      ],
     );
   }
 
