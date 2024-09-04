@@ -361,66 +361,71 @@ class _registerPageState extends State<registerPage> {
   }
 
   void signup() {
-    if (usernameController.text.isEmpty ||
-        fullnameController.text.isEmpty ||
-        addmoneyController.text.isEmpty ||
-        emailController.text.isEmpty ||
-        passwordController.text.isEmpty) {
-      setState(() {
+    setState(() {
+      if (usernameController.text.isEmpty ||
+          fullnameController.text.isEmpty ||
+          addmoneyController.text.isEmpty ||
+          emailController.text.isEmpty ||
+          passwordController.text.isEmpty) {
         text = "กรุณากรอกข้อมูลให้ครบทุกช่อง";
         return;
-      });
-    } else {
-      var model = RegisterPostReq(
+      } else if (!RegExp(r'^[0-9]+$').hasMatch(addmoneyController.text)) {
+        // ตรวจสอบว่า addmoneyController มีแต่ตัวเลขเท่านั้น
+        text = "กรุณากรอกจำนวนเงินเป็นตัวเลขเท่านั้น";
+        return;
+      } else {
+        var model = RegisterPostReq(
           username: usernameController.text,
           password: passwordController.text,
           fullname: fullnameController.text,
           wallet: int.parse(addmoneyController.text), // Convert String to int
           email: emailController.text,
           img:
-              "https://e7.pngegg.com/pngimages/340/946/png-clipart-avatar-user-computer-icons-software-developer-avatar-child-face-thumbnail.png");
-      http
-          .post(
-        Uri.parse('$url/users/adduser'),
-        headers: {"Content-Type": "application/json; charset=utf-8"},
-        body: registerPostReqToJson(model),
-      )
-          .then((response) {
-        if (response.statusCode == 201) {
-          // Registration successful
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => const LoginPage(),
-            ),
-          );
-        } else if (response.statusCode == 409) {
-          // User already exists (HTTP status 409 Conflict)
-          showDialog(
-            context: context,
-            builder: (BuildContext context) {
-              return AlertDialog(
-                title: const Text('การลงทะเบียนล้มเหลว'),
-                content: const Text(
-                    'ชื่อผู้ใช้นี้มีอยู่แล้วในระบบ กรุณาใช้ชื่อผู้ใช้อื่น.'),
-                actions: <Widget>[
-                  TextButton(
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                    child: const Text('ตกลง'),
-                  ),
-                ],
-              );
-            },
-          );
-        } else {
-          // Handle other status codes
-          log('Error: ${response.statusCode}');
-        }
-      }).catchError((err) {
-        log(err.toString());
-      });
-    }
+              "https://e7.pngegg.com/pngimages/340/946/png-clipart-avatar-user-computer-icons-software-developer-avatar-child-face-thumbnail.png",
+        );
+        http
+            .post(
+          Uri.parse('$url/users/adduser'),
+          headers: {"Content-Type": "application/json; charset=utf-8"},
+          body: registerPostReqToJson(model),
+        )
+            .then((response) {
+          if (response.statusCode == 201) {
+            // Registration successful
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const LoginPage(),
+              ),
+            );
+          } else if (response.statusCode == 409) {
+            // User already exists (HTTP status 409 Conflict)
+            showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return AlertDialog(
+                  title: const Text('การลงทะเบียนล้มเหลว'),
+                  content: const Text(
+                      'ชื่อผู้ใช้นี้มีอยู่แล้วในระบบ กรุณาใช้ชื่อผู้ใช้อื่น.'),
+                  actions: <Widget>[
+                    TextButton(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                      child: const Text('ตกลง'),
+                    ),
+                  ],
+                );
+              },
+            );
+          } else {
+            // Handle other status codes
+            log('Error: ${response.statusCode}');
+          }
+        }).catchError((err) {
+          log(err.toString());
+        });
+      }
+    });
   }
 }
