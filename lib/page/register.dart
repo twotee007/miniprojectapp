@@ -373,6 +373,10 @@ class _registerPageState extends State<registerPage> {
         // ตรวจสอบว่า addmoneyController มีแต่ตัวเลขเท่านั้น
         text = "กรุณากรอกจำนวนเงินเป็นตัวเลขเท่านั้น";
         return;
+      } else if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
+          .hasMatch(emailController.text)) {
+        // ถ้ารูปแบบอีเมลไม่ถูกต้อง
+        text = "กรุณากรอก Email ให้ถูกต้อง";
       } else {
         var model = RegisterPostReq(
           username: usernameController.text,
