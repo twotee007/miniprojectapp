@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:developer';
 
 import 'package:flutter/gestures.dart';
@@ -13,6 +14,41 @@ class registerPage extends StatefulWidget {
 
   @override
   _registerPageState createState() => _registerPageState();
+}
+
+class BackgroundCircles extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      children: [
+        // Background Circles
+        Positioned(
+          top: -70,
+          right: 15,
+          child: Container(
+            width: 142,
+            height: 142,
+            decoration: const BoxDecoration(
+              color: Color(0xFF471AA0), // Dark Purple
+              shape: BoxShape.circle,
+            ),
+          ),
+        ),
+        Positioned(
+          top: -15,
+          right: -65,
+          child: Container(
+            width: 142,
+            height: 142,
+            decoration: const BoxDecoration(
+              color: Color(0xFFC17E7E), // Light Pink
+              shape: BoxShape.circle,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
 }
 
 class _registerPageState extends State<registerPage> {
@@ -43,31 +79,7 @@ class _registerPageState extends State<registerPage> {
       body: Stack(
         children: [
           // วงกลมพื้นหลัง
-          Positioned(
-            top: -70,
-            right: 15,
-            child: Container(
-              width: 142,
-              height: 142,
-              decoration: const BoxDecoration(
-                color: Color(0xFF471AA0), // สีม่วงเข้ม
-                shape: BoxShape.circle,
-              ),
-            ),
-          ),
-          Positioned(
-            top: -15,
-            right: -65,
-            child: Container(
-              width: 142,
-              height: 142,
-              decoration: const BoxDecoration(
-                color: Color(0xFFC17E7E), // สีชมพูอ่อน
-                shape: BoxShape.circle,
-              ),
-            ),
-          ),
-
+          BackgroundCircles(),
           // ปุ่ม Back พร้อมข้อความ
           Positioned(
             top: 40, // ตำแหน่งเริ่มต้น
@@ -421,8 +433,33 @@ class _registerPageState extends State<registerPage> {
     );
   }
 
-  void signup() {
-    setState(() {
+  Future<Map<String, bool>> checkUserExists(
+      String username, String email) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$url/users/check'), // Endpoint สำหรับการตรวจสอบความซ้ำซ้อน
+        headers: {"Content-Type": "application/json; charset=utf-8"},
+        body: jsonEncode({'username': username, 'email': email}),
+      );
+
+      if (response.statusCode == 200) {
+        final result = jsonDecode(response.body);
+        return {
+          'usernameExists': result['usernameExists'] ?? false,
+          'emailExists': result['emailExists'] ?? false,
+        };
+      } else {
+        log('Error: ${response.statusCode}');
+        return {'usernameExists': false, 'emailExists': false};
+      }
+    } catch (err) {
+      log(err.toString());
+      return {'usernameExists': false, 'emailExists': false};
+    }
+  }
+
+  void signup() async {
+    setState(() async {
       if (usernameController.text.isEmpty ||
           fullnameController.text.isEmpty ||
           addmoneyController.text.isEmpty ||
@@ -431,79 +468,110 @@ class _registerPageState extends State<registerPage> {
         text = "กรุณากรอกข้อมูลให้ครบทุกช่อง";
         return;
       } else if (!RegExp(r'^[0-9]+$').hasMatch(addmoneyController.text)) {
-        // ตรวจสอบว่า addmoneyController มีแต่ตัวเลขเท่านั้น
         text = "กรุณากรอกจำนวนเงินเป็นตัวเลขเท่านั้น";
         return;
       } else if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
           .hasMatch(emailController.text)) {
-        // ถ้ารูปแบบอีเมลไม่ถูกต้อง
         text = "กรุณากรอก Email ให้ถูกต้อง";
+        return;
       } else if (passwordController.text != confirmPasswordController.text) {
-        // ตรวจสอบว่า password และ confirmPassword ตรงกันหรือไม่
         text = "รหัสผ่านและยืนยันรหัสผ่านไม่ตรงกัน";
         return;
-      } else {
-        var model = RegisterPostReq(
-          username: usernameController.text,
-          password: passwordController.text,
-          fullname: fullnameController.text,
-          wallet: int.parse(addmoneyController.text), // Convert String to int
-          email: emailController.text,
-          img:
-              "https://e7.pngegg.com/pngimages/340/946/png-clipart-avatar-user-computer-icons-software-developer-avatar-child-face-thumbnail.png",
+      }
+
+      // เรียกใช้ฟังก์ชันตรวจสอบความซ้ำซ้อน
+      Map<String, bool> checkResults;
+
+      try {
+        checkResults = await checkUserExists(
+            usernameController.text, emailController.text);
+      } catch (e) {
+        log(e.toString());
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text(
+              'เกิดข้อผิดพลาดในการตรวจสอบข้อมูล.',
+              style: TextStyle(color: Colors.red),
+            ),
+            backgroundColor: Colors.white,
+            behavior: SnackBarBehavior.floating,
+          ),
         );
-        showDialog(
-          context: context,
-          barrierDismissible:
-              false, // ป้องกันไม่ให้ปิดป๊อปอัปด้วยการแตะที่ด้านนอก
-          builder: (BuildContext context) {
-            return const Center(
-              child: CircularProgressIndicator(), // Spinner แสดงสถานะการโหลด
-            );
-          },
-        );
-        http
-            .post(
+        return;
+      }
+
+      if (checkResults['usernameExists'] == true) {
+        text = "ชื่อผู้ใช้นี้มีอยู่แล้วในระบบ";
+        return;
+      } else if (checkResults['emailExists'] == true) {
+        text = "อีเมลนี้มีอยู่แล้วในระบบ กรุณาใช้ email อื่น";
+        return;
+      }
+
+      var model = RegisterPostReq(
+        username: usernameController.text,
+        password: passwordController.text,
+        fullname: fullnameController.text,
+        wallet: int.parse(addmoneyController.text), // Convert String to int
+        email: emailController.text,
+        img:
+            "https://e7.pngegg.com/pngimages/340/946/png-clipart-avatar-user-computer-icons-software-developer-avatar-child-face-thumbnail.png",
+      );
+
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return const Center(
+            child: CircularProgressIndicator(), // Spinner แสดงสถานะการโหลด
+          );
+        },
+      );
+
+      try {
+        final response = await http.post(
           Uri.parse('$url/users/adduser'),
           headers: {"Content-Type": "application/json; charset=utf-8"},
           body: registerPostReqToJson(model),
-        )
-            .then((response) {
-          if (response.statusCode == 201) {
-            // Registration successful
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const LoginPage(),
+        );
+
+        Navigator.of(context).pop(); // ปิด Dialog การโหลด
+
+        if (response.statusCode == 201) {
+          // Registration successful
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const LoginPage(),
+            ),
+          );
+        } else {
+          // Handle other status codes
+          log('Error: ${response.statusCode}');
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: const Text(
+                'เกิดข้อผิดพลาด กรุณาลองอีกครั้ง.',
+                style: TextStyle(color: Colors.red),
               ),
-            );
-          } else if (response.statusCode == 409) {
-            // User already exists (HTTP status 409 Conflict)
-            showDialog(
-              context: context,
-              builder: (BuildContext context) {
-                return AlertDialog(
-                  title: const Text('การลงทะเบียนล้มเหลว'),
-                  content: const Text(
-                      'ชื่อผู้ใช้นี้มีอยู่แล้วในระบบ กรุณาใช้ชื่อผู้ใช้อื่น.'),
-                  actions: <Widget>[
-                    TextButton(
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                      },
-                      child: const Text('ตกลง'),
-                    ),
-                  ],
-                );
-              },
-            );
-          } else {
-            // Handle other status codes
-            log('Error: ${response.statusCode}');
-          }
-        }).catchError((err) {
-          log(err.toString());
-        });
+              backgroundColor: Colors.white,
+              behavior: SnackBarBehavior.floating,
+            ),
+          );
+        }
+      } catch (err) {
+        Navigator.of(context).pop(); // ปิด Dialog การโหลด
+        log(err.toString());
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text(
+              'เกิดข้อผิดพลาดในการเชื่อมต่อกับเซิร์ฟเวอร์.',
+              style: TextStyle(color: Colors.red),
+            ),
+            backgroundColor: Colors.white,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
       }
     });
   }
