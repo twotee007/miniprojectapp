@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
@@ -223,7 +224,7 @@ class _LoginPageState extends State<LoginPage> {
         headers: {"Content-Type": "application/json; charset=utf-8"},
         body: userPostReqToJson(model),
       );
-
+      var decodedResponse = jsonDecode(response.body);
       log('Response status: ${response.statusCode}');
       log('Response body: ${response.body}');
 
@@ -258,9 +259,9 @@ class _LoginPageState extends State<LoginPage> {
           });
         }
       } else {
-        Navigator.pop(context); // ปิดป๊อปอัปเมื่อการเข้าสู่ระบบไม่สำเร็จ
+        Navigator.pop(context); // Close popup when login fails
         setState(() {
-          text = "Username or Password Incorrect";
+          text = 'Login failed: ${decodedResponse['message']}';
         });
       }
     } catch (err) {
