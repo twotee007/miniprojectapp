@@ -34,7 +34,7 @@ class _ScreenPageState extends State<ScreenPage>
         print('LocationServicesStatus: $event');
       });
     }
-    _getLocation();
+    _getLocation(); // ดึงตำแหน่งทันทีเมื่อเริ่มต้นแอพ
     Future.delayed(const Duration(seconds: 5), () {
       Navigator.of(context).pushReplacement(
           MaterialPageRoute(builder: (_) => const LoginPage()));
@@ -51,66 +51,33 @@ class _ScreenPageState extends State<ScreenPage>
     super.dispose();
   }
 
-  Future<bool> _checkAndRequestPermission({bool? background}) async {
-    if (!await FlLocation.isLocationServicesEnabled) {
-      _resultText.value = 'บริการตำแหน่งถูกปิดใช้งาน.';
-      return false;
-    }
-
-    var locationPermission = await FlLocation.checkLocationPermission();
-    if (locationPermission == LocationPermission.deniedForever) {
-      _resultText.value = 'การอนุญาตตำแหน่งถูกปฏิเสธถาวร.';
-      return false;
-    } else if (locationPermission == LocationPermission.denied) {
-      locationPermission = await FlLocation.requestLocationPermission();
-      if (locationPermission == LocationPermission.denied ||
-          locationPermission == LocationPermission.deniedForever) {
-        _resultText.value = 'การอนุญาตตำแหน่งถูกปฏิเสธ.';
-        return false;
-      }
-    }
-
-    if (background == true &&
-        locationPermission == LocationPermission.whileInUse) {
-      _resultText.value =
-          'ต้องการการอนุญาตตำแหน่งตลอดเวลาสำหรับการรวบรวมตำแหน่งในพื้นหลัง.';
-      return false;
-    }
-
-    return true;
-  }
-
   Future<void> _getLocation() async {
-    if (await _checkAndRequestPermission()) {
-      _getLocationButtonState.value = ButtonState.LOADING;
-      _subscribeLocationStreamButtonState.value = ButtonState.DISABLED;
+    _getLocationButtonState.value = ButtonState.LOADING;
+    _subscribeLocationStreamButtonState.value = ButtonState.DISABLED;
 
-      try {
-        final Duration timeLimit = const Duration(seconds: 10);
-        final location = await FlLocation.getLocation(timeLimit: timeLimit);
-        _onLocationDetected(location);
-      } catch (error) {
-        _handleError(error);
-      } finally {
-        _getLocationButtonState.value = ButtonState.DONE;
-        _subscribeLocationStreamButtonState.value = ButtonState.DONE;
-      }
+    try {
+      final Duration timeLimit = const Duration(seconds: 10);
+      final location = await FlLocation.getLocation(timeLimit: timeLimit);
+      _onLocationDetected(location);
+    } catch (error) {
+      _handleError(error);
+    } finally {
+      _getLocationButtonState.value = ButtonState.DONE;
+      _subscribeLocationStreamButtonState.value = ButtonState.DONE;
     }
   }
 
   Future<void> _subscribeLocationStream() async {
-    if (await _checkAndRequestPermission()) {
-      if (_locationSubscription != null) {
-        await _unsubscribeLocationStream();
-      }
-
-      _locationSubscription = FlLocation.getLocationStream()
-          .handleError(_handleError)
-          .listen(_onLocationDetected);
-
-      _getLocationButtonState.value = ButtonState.DISABLED;
-      _isSubscribeLocationStream.value = true;
+    if (_locationSubscription != null) {
+      await _unsubscribeLocationStream();
     }
+
+    _locationSubscription = FlLocation.getLocationStream()
+        .handleError(_handleError)
+        .listen(_onLocationDetected);
+
+    _getLocationButtonState.value = ButtonState.DISABLED;
+    _isSubscribeLocationStream.value = true;
   }
 
   Future<void> _unsubscribeLocationStream() async {

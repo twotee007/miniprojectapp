@@ -21,7 +21,10 @@ class _registerPageState extends State<registerPage> {
   var addmoneyController = TextEditingController();
   var emailController = TextEditingController();
   var passwordController = TextEditingController();
-  bool _obscureText = true;
+  var confirmPasswordController = TextEditingController();
+  bool _obscureTextPassword = true; // สำหรับช่อง Password
+  bool _obscureTextConfirmPassword = true; // สำหรับช่อง Confirm Password
+
   String text = '';
   String url = '';
   void initState() {
@@ -261,21 +264,25 @@ class _registerPageState extends State<registerPage> {
                         vertical: 14.0), // เพิ่มระยะห่างภายในกล่องข้อความ
                   ),
                 ),
-                const SizedBox(height: 25), // เพิ่มระยะห่างระหว่างกล่องข้อความ
+                const SizedBox(height: 25),
                 TextField(
                   controller: passwordController,
-                  obscureText: _obscureText, // ใช้สถานะในการควบคุมการมองเห็น
+                  obscureText:
+                      _obscureTextPassword, // ใช้สถานะในการควบคุมการมองเห็น
                   decoration: InputDecoration(
                     prefixIcon:
                         const Icon(Icons.lock, color: Color(0xFF471AA0)),
                     suffixIcon: IconButton(
                       icon: Icon(
-                        _obscureText ? Icons.visibility_off : Icons.visibility,
+                        _obscureTextPassword
+                            ? Icons.visibility_off
+                            : Icons.visibility,
                         color: const Color(0xFF9747FF),
                       ),
                       onPressed: () {
                         setState(() {
-                          _obscureText = !_obscureText; // สลับสถานะการมองเห็น
+                          _obscureTextPassword =
+                              !_obscureTextPassword; // สลับสถานะการมองเห็น
                         });
                       },
                     ),
@@ -302,10 +309,64 @@ class _registerPageState extends State<registerPage> {
                       ),
                     ),
                     contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 16.0,
-                        vertical: 14.0), // เพิ่มระยะห่างภายในกล่องข้อความ
+                      horizontal: 16.0,
+                      vertical: 14.0,
+                    ), // เพิ่มระยะห่างภายในกล่องข้อความ
                   ),
                 ),
+                const SizedBox(height: 25), // เพิ่มระยะห่างระหว่างกล่องข้อความ
+                TextField(
+                  controller:
+                      confirmPasswordController, // ใช้ confirmPasswordController
+                  obscureText:
+                      _obscureTextConfirmPassword, // ใช้สถานะในการควบคุมการมองเห็น
+                  decoration: InputDecoration(
+                    prefixIcon:
+                        const Icon(Icons.lock, color: Color(0xFF471AA0)),
+                    suffixIcon: IconButton(
+                      icon: Icon(
+                        _obscureTextConfirmPassword
+                            ? Icons.visibility_off
+                            : Icons.visibility,
+                        color: const Color(0xFF9747FF),
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          _obscureTextConfirmPassword =
+                              !_obscureTextConfirmPassword; // สลับสถานะการมองเห็น
+                        });
+                      },
+                    ),
+                    labelText:
+                        'Confirm Password', // เปลี่ยนเป็น Confirm Password
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12.0),
+                      borderSide: const BorderSide(
+                        width: 1.0,
+                        color: Color(0xFF9747FF),
+                      ),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12.0),
+                      borderSide: const BorderSide(
+                        width: 1.0,
+                        color: Color(0xFF9747FF),
+                      ),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12.0),
+                      borderSide: const BorderSide(
+                        width: 2.0,
+                        color: Color(0xFF9747FF),
+                      ),
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 16.0,
+                      vertical: 14.0,
+                    ), // เพิ่มระยะห่างภายในกล่องข้อความ
+                  ),
+                ),
+
                 const SizedBox(height: 10),
                 Center(
                   child: Text(text),
@@ -377,6 +438,10 @@ class _registerPageState extends State<registerPage> {
           .hasMatch(emailController.text)) {
         // ถ้ารูปแบบอีเมลไม่ถูกต้อง
         text = "กรุณากรอก Email ให้ถูกต้อง";
+      } else if (passwordController.text != confirmPasswordController.text) {
+        // ตรวจสอบว่า password และ confirmPassword ตรงกันหรือไม่
+        text = "รหัสผ่านและยืนยันรหัสผ่านไม่ตรงกัน";
+        return;
       } else {
         var model = RegisterPostReq(
           username: usernameController.text,
@@ -386,6 +451,16 @@ class _registerPageState extends State<registerPage> {
           email: emailController.text,
           img:
               "https://e7.pngegg.com/pngimages/340/946/png-clipart-avatar-user-computer-icons-software-developer-avatar-child-face-thumbnail.png",
+        );
+        showDialog(
+          context: context,
+          barrierDismissible:
+              false, // ป้องกันไม่ให้ปิดป๊อปอัปด้วยการแตะที่ด้านนอก
+          builder: (BuildContext context) {
+            return const Center(
+              child: CircularProgressIndicator(), // Spinner แสดงสถานะการโหลด
+            );
+          },
         );
         http
             .post(
