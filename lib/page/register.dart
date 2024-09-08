@@ -459,113 +459,112 @@ class _registerPageState extends State<registerPage> {
   }
 
   void signup() async {
-    setState(() async {
-      if (usernameController.text.isEmpty ||
-          fullnameController.text.isEmpty ||
-          addmoneyController.text.isEmpty ||
-          emailController.text.isEmpty ||
-          passwordController.text.isEmpty) {
+    // ตรวจสอบข้อมูลก่อนการสมัคร
+    if (usernameController.text.isEmpty ||
+        fullnameController.text.isEmpty ||
+        addmoneyController.text.isEmpty ||
+        emailController.text.isEmpty ||
+        passwordController.text.isEmpty) {
+      setState(() {
         text = "กรุณากรอกข้อมูลให้ครบทุกช่อง";
-        return;
-      } else if (!RegExp(r'^[0-9]+$').hasMatch(addmoneyController.text)) {
+      });
+      return;
+    } else if (!RegExp(r'^[0-9]+$').hasMatch(addmoneyController.text)) {
+      setState(() {
         text = "กรุณากรอกจำนวนเงินเป็นตัวเลขเท่านั้น";
-        return;
-      } else if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
-          .hasMatch(emailController.text)) {
+      });
+      return;
+    } else if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
+        .hasMatch(emailController.text)) {
+      setState(() {
         text = "กรุณากรอก Email ให้ถูกต้อง";
-        return;
-      } else if (passwordController.text != confirmPasswordController.text) {
+      });
+      return;
+    } else if (passwordController.text != confirmPasswordController.text) {
+      setState(() {
         text = "รหัสผ่านและยืนยันรหัสผ่านไม่ตรงกัน";
-        return;
-      }
+      });
+      return;
+    }
 
-      // เรียกใช้ฟังก์ชันตรวจสอบความซ้ำซ้อน
-      Map<String, bool> checkResults;
+    // เรียกใช้ฟังก์ชันตรวจสอบความซ้ำซ้อน
+    Map<String, bool> checkResults;
 
-      try {
-        checkResults = await checkUserExists(
-            usernameController.text, emailController.text);
-      } catch (e) {
-        log(e.toString());
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: const Text(
-              'เกิดข้อผิดพลาดในการตรวจสอบข้อมูล.',
-              style: TextStyle(color: Colors.red),
-            ),
-            backgroundColor: Colors.white,
-            behavior: SnackBarBehavior.floating,
+    try {
+      checkResults =
+          await checkUserExists(usernameController.text, emailController.text);
+    } catch (e) {
+      log(e.toString());
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text(
+            'เกิดข้อผิดพลาดในการตรวจสอบข้อมูล.',
+            style: TextStyle(color: Colors.red),
           ),
-        );
-        return;
-      }
+          backgroundColor: Colors.white,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+      return;
+    }
 
-      if (checkResults['usernameExists'] == true) {
+    if (checkResults['usernameExists'] == true) {
+      setState(() {
         text = "ชื่อผู้ใช้นี้มีอยู่แล้วในระบบ";
-        return;
-      } else if (checkResults['emailExists'] == true) {
+      });
+      return;
+    } else if (checkResults['emailExists'] == true) {
+      setState(() {
         text = "อีเมลนี้มีอยู่แล้วในระบบ กรุณาใช้ email อื่น";
-        return;
-      }
+      });
+      return;
+    }
 
-      var model = RegisterPostReq(
-        username: usernameController.text,
-        password: passwordController.text,
-        fullname: fullnameController.text,
-        wallet: int.parse(addmoneyController.text), // Convert String to int
-        email: emailController.text,
-        img:
-            "https://e7.pngegg.com/pngimages/340/946/png-clipart-avatar-user-computer-icons-software-developer-avatar-child-face-thumbnail.png",
-      );
+    // สร้างโมเดลข้อมูลสำหรับการสมัคร
+    var model = RegisterPostReq(
+      username: usernameController.text,
+      password: passwordController.text,
+      fullname: fullnameController.text,
+      wallet: int.parse(addmoneyController.text), // Convert String to int
+      email: emailController.text,
+      img:
+          "https://e7.pngegg.com/pngimages/340/946/png-clipart-avatar-user-computer-icons-software-developer-avatar-child-face-thumbnail.png",
+    );
 
-      showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (BuildContext context) {
-          return const Center(
-            child: CircularProgressIndicator(), // Spinner แสดงสถานะการโหลด
-          );
-        },
-      );
-
-      try {
-        final response = await http.post(
-          Uri.parse('$url/users/adduser'),
-          headers: {"Content-Type": "application/json; charset=utf-8"},
-          body: registerPostReqToJson(model),
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return const Center(
+          child: CircularProgressIndicator(), // Spinner แสดงสถานะการโหลด
         );
+      },
+    );
 
-        Navigator.of(context).pop(); // ปิด Dialog การโหลด
+    try {
+      final response = await http.post(
+        Uri.parse('$url/users/adduser'),
+        headers: {"Content-Type": "application/json; charset=utf-8"},
+        body: registerPostReqToJson(model),
+      );
 
-        if (response.statusCode == 201) {
-          // Registration successful
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => const LoginPage(),
-            ),
-          );
-        } else {
-          // Handle other status codes
-          log('Error: ${response.statusCode}');
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: const Text(
-                'เกิดข้อผิดพลาด กรุณาลองอีกครั้ง.',
-                style: TextStyle(color: Colors.red),
-              ),
-              backgroundColor: Colors.white,
-              behavior: SnackBarBehavior.floating,
-            ),
-          );
-        }
-      } catch (err) {
-        Navigator.of(context).pop(); // ปิด Dialog การโหลด
-        log(err.toString());
+      Navigator.of(context).pop(); // ปิด Dialog การโหลด
+
+      if (response.statusCode == 201) {
+        // Registration successful
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const LoginPage(),
+          ),
+        );
+      } else {
+        // Handle other status codes
+        log('Error: ${response.statusCode}');
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: const Text(
-              'เกิดข้อผิดพลาดในการเชื่อมต่อกับเซิร์ฟเวอร์.',
+              'เกิดข้อผิดพลาด กรุณาลองอีกครั้ง.',
               style: TextStyle(color: Colors.red),
             ),
             backgroundColor: Colors.white,
@@ -573,6 +572,19 @@ class _registerPageState extends State<registerPage> {
           ),
         );
       }
-    });
+    } catch (err) {
+      Navigator.of(context).pop(); // ปิด Dialog การโหลด
+      log(err.toString());
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text(
+            'เกิดข้อผิดพลาดในการเชื่อมต่อกับเซิร์ฟเวอร์.',
+            style: TextStyle(color: Colors.red),
+          ),
+          backgroundColor: Colors.white,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    }
   }
 }
