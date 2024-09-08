@@ -97,30 +97,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.3.1"
-  fl_location:
-    dependency: "direct main"
-    description:
-      name: fl_location
-      sha256: "7ef471bf91ab5ce3dcd38d1ff764b0e6d6fba5e70bdcd0d7103e9538257a2c91"
-      url: "https://pub.dev"
-    source: hosted
-    version: "4.1.0"
-  fl_location_platform_interface:
-    dependency: transitive
-    description:
-      name: fl_location_platform_interface
-      sha256: "1146e5d954394929ff8fc8e72de92241e9a8b9d6ccfd4d095eb90cac3d13747d"
-      url: "https://pub.dev"
-    source: hosted
-    version: "5.0.0"
-  fl_location_web:
-    dependency: transitive
-    description:
-      name: fl_location_web
-      sha256: bb1ad1d47e8291bcdf11f78f977624ae775e1f98900fe061a19d8a64e6731f01
-      url: "https://pub.dev"
-    source: hosted
-    version: "4.1.0"
   flutter:
     dependency: "direct main"
     description: flutter
@@ -144,11 +120,6 @@ packages:
     version: "3.0.2"
   flutter_test:
     dependency: "direct dev"
-    description: flutter
-    source: sdk
-    version: "0.0.0"
-  flutter_web_plugins:
-    dependency: transitive
     description: flutter
     source: sdk
     version: "0.0.0"
@@ -256,14 +227,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "6.0.2"
-  plugin_platform_interface:
-    dependency: transitive
-    description:
-      name: plugin_platform_interface
-      sha256: "4820fbfdb9478b1ebae27888254d445073732dae3d6ea81f0b7e06d5dedc3f02"
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.1.8"
   sky_engine:
     dependency: transitive
     description: flutter
@@ -337,10 +300,10 @@ packages:
     dependency: transitive
     description:
       name: vm_service
-      sha256: f652077d0bdf60abe4c1f6377448e8655008eef28f128bc023f7b5e8dfeb48fc
+      sha256: "5c5f338a667b4c644744b661f309fb8080bb94b18a7e91ef1dbd343bed00ed6d"
       url: "https://pub.dev"
     source: hosted
-    version: "14.2.4"
+    version: "14.2.5"
   web:
     dependency: transitive
     description:

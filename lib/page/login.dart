@@ -78,7 +78,7 @@ class _LoginPageState extends State<LoginPage> {
               decoration: InputDecoration(
                 prefixIcon: const Icon(Icons.person_4_outlined,
                     color: Color(0xFF471AA0)), // ไอคอนด้านซ้าย
-                labelText: 'Username or Password',
+                labelText: 'Email or Username',
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12.0),
                   borderSide: const BorderSide(
