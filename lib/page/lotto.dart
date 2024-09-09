@@ -84,7 +84,7 @@ class _LottoPurchasePageState extends State<LottoPage> {
 
         setState(() {
           lottoGetRes = lottosearch;
-          searchMessage = 'ผลลัพธ์เลขที่ต้องการ=> ' +
+          searchMessage = 'เลขที่ท่านต้องการ=> ' +
               inputDigits.map((digit) => digit.isEmpty ? '*' : digit).join(' ');
         });
 
