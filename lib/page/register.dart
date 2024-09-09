@@ -487,6 +487,17 @@ class _registerPageState extends State<registerPage> {
       return;
     }
 
+    // แสดง spinner รอผลการตรวจสอบข้อมูลซ้ำซ้อน
+    showDialog(
+      context: context,
+      barrierDismissible: false, // ป้องกันการปิดป๊อปอัป
+      builder: (BuildContext context) {
+        return const Center(
+          child: CircularProgressIndicator(), // Spinner รอผลการโหลด
+        );
+      },
+    );
+
     // เรียกใช้ฟังก์ชันตรวจสอบความซ้ำซ้อน
     Map<String, bool> checkResults;
 
@@ -494,6 +505,7 @@ class _registerPageState extends State<registerPage> {
       checkResults =
           await checkUserExists(usernameController.text, emailController.text);
     } catch (e) {
+      Navigator.of(context).pop(); // ปิด spinner เมื่อมีข้อผิดพลาด
       log(e.toString());
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -507,6 +519,8 @@ class _registerPageState extends State<registerPage> {
       );
       return;
     }
+
+    Navigator.of(context).pop(); // ปิด spinner หลังตรวจสอบข้อมูลเสร็จ
 
     if (checkResults['usernameExists'] == true) {
       setState(() {
