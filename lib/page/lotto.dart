@@ -30,7 +30,7 @@ class _LottoPurchasePageState extends State<LottoPage> {
   // Add TextEditingController for each input field
   final List<TextEditingController> controllers =
       List.generate(6, (index) => TextEditingController());
-
+  final List<FocusNode> focusNodes = List.generate(6, (_) => FocusNode());
   @override
   void initState() {
     super.initState();
@@ -46,10 +46,8 @@ class _LottoPurchasePageState extends State<LottoPage> {
 
   @override
   void dispose() {
-    // Dispose controllers when the widget is disposed
-    for (var controller in controllers) {
-      controller.dispose();
-    }
+    controllers.forEach((controller) => controller.dispose());
+    focusNodes.forEach((focusNode) => focusNode.dispose());
     super.dispose();
   }
 
@@ -115,52 +113,6 @@ class _LottoPurchasePageState extends State<LottoPage> {
       });
     }
     numbersearch = '';
-    // if (numbersearch == '______') {
-    //   loadData = loadDataAstnc();
-    //   searchMessage = 'ทั้งหมด';
-    // } else {
-    //   setState(() {
-    //     searchMessage = 'ผลลัพธ์เลขที่ต้องการ=> ' +
-    //         inputDigits.map((digit) => digit.isEmpty ? '*' : digit).join(' ');
-    //   });
-    // }
-    // log(numbersearch);
-    //   // Check if all input fields are empty
-    //   if (inputDigits.every((digit) => digit.isEmpty)) {
-    //     // Reset to show all lotto results
-    //     loadData = loadDataAstnc();
-    //     searchMessage = 'ทั้งหมด'; // Reset message
-    //     // Clear previous search results
-    //   } else {
-    //     // Generate the search pattern with asterisks
-
-    //     // Filter lotto results based on input digits
-    //     var filteredResults = lottoGetRes.where((lotto) {
-    //       String formattedNumber = lotto.number;
-
-    //       // Check if the formatted number matches the input digits at specific positions
-    //       for (int i = 0; i < inputDigits.length; i++) {
-    //         if (inputDigits[i].isNotEmpty &&
-    //             (formattedNumber.length <= i ||
-    //                 formattedNumber[i] != inputDigits[i])) {
-    //           return false; // Exclude if not matching
-    //         }
-    //       }
-    //       return true; // Include if matching
-    //     }).toList();
-
-    //     // Update the lottoGetRes with filtered results
-    //     if (filteredResults.isEmpty) {
-    //       // If no results, notify the user and reset data for continuous search
-    //       searchMessage = 'ไม่พบเลขที่ท่านต้องการ';
-    //       loadData = loadDataAstnc(); // Reload all data
-    //     } else {
-    //       lottoGetRes = filteredResults;
-
-    //       // Update the lottoGetRes with the filtered results
-    //     }
-    //   }
-    // });
   }
 
   @override
@@ -340,6 +292,7 @@ class _LottoPurchasePageState extends State<LottoPage> {
                               ),
                               child: TextField(
                                 controller: controllers[index],
+                                focusNode: focusNodes[index],
                                 textAlign: TextAlign.center,
                                 keyboardType: TextInputType.number,
                                 maxLength: 1,
@@ -353,6 +306,19 @@ class _LottoPurchasePageState extends State<LottoPage> {
                                   fontWeight: FontWeight.bold,
                                   color: Colors.black.withOpacity(0.6),
                                 ),
+                                onChanged: (value) {
+                                  // Move to the next field if a digit is entered
+                                  if (value.length == 1 &&
+                                      index < controllers.length - 1) {
+                                    FocusScope.of(context)
+                                        .requestFocus(focusNodes[index + 1]);
+                                  }
+                                  // Move to the previous field if the current field is emptied
+                                  else if (value.isEmpty && index > 0) {
+                                    FocusScope.of(context)
+                                        .requestFocus(focusNodes[index - 1]);
+                                  }
+                                },
                               ),
                             );
                           }),
@@ -423,8 +389,8 @@ class _LottoPurchasePageState extends State<LottoPage> {
                   Text(
                     searchMessage,
                     style: TextStyle(
-                      fontSize: 20,
-                      fontFamily: 'RhodiumLibre',
+                      fontSize: 16,
+                      fontFamily: 'Revalia',
                       fontWeight: FontWeight.bold,
                       color: Colors.black,
                     ),
