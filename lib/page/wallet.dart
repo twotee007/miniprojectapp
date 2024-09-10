@@ -130,6 +130,19 @@ class _WalletPageState extends State<WalletPage> {
                       color: Colors.black,
                     ),
                   ),
+                  InkWell(
+                    onTap: () {
+                      // Add your refresh logic here
+                      setState(() {
+                        loadData = loadDataAstnc();
+                      });
+                    },
+                    child: Icon(
+                      Icons
+                          .refresh, // You can use a different icon if you prefer
+                      color: const Color.fromARGB(255, 0, 0, 0),
+                    ),
+                  ),
                   const SizedBox(height: 10),
                   // Wallet Information
                   Container(
@@ -147,6 +160,7 @@ class _WalletPageState extends State<WalletPage> {
                         ),
                       ],
                     ),
+
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -225,6 +239,18 @@ class _WalletPageState extends State<WalletPage> {
                         if (snapshot.connectionState != ConnectionState.done) {
                           return const Center(
                             child: CircularProgressIndicator(),
+                          );
+                        }
+                        if (lottoGetResUser.isEmpty) {
+                          return const Center(
+                            child: Text(
+                              'ท่านยังไม่ได้ซื้อสลาก',
+                              style: const TextStyle(
+                                fontSize: 18,
+                                fontFamily: 'RhodiumLibre',
+                                color: Color.fromARGB(255, 0, 0, 0),
+                              ), //
+                            ),
                           );
                         }
                         return ListView(
