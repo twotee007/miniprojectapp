@@ -1,5 +1,9 @@
+import 'dart:async';
+import 'dart:convert';
 import 'dart:developer';
 import 'dart:ui'; // Import for the BackdropFilter
+import 'package:LOTTO168/page/login.dart';
+import 'package:LOTTO168/response/useruid_get_res.dart';
 import 'package:flutter/material.dart';
 import 'package:LOTTO168/config/config.dart';
 import 'package:LOTTO168/page/Widget.dart';
@@ -20,13 +24,22 @@ class HomePage extends StatefulWidget {
 class _HomePage extends State<HomePage> {
   String activePage = 'home'; // State variable to track the active page
   List<LottoGetRes> lottoGetRes = [];
+  List<UseruidGetRes> usergetRes = [];
   late Future<void> loadData;
+  Timer? _timer;
   @override
   void initState() {
     // TODO: implement initState
-    log(widget.uid.toString());
     super.initState();
     loadData = loadDataAstnc();
+    startCheckingUserStatus();
+  }
+
+  @override
+  void dispose() {
+    // หยุดการทำงานของ Timer เมื่อหน้า widget ถูกปิด
+    _timer?.cancel();
+    super.dispose();
   }
 
   @override
@@ -330,6 +343,12 @@ class _HomePage extends State<HomePage> {
     );
   }
 
+  void startCheckingUserStatus() {
+    _timer = Timer.periodic(Duration(seconds: 5), (Timer timer) {
+      Cheackuser(); // เรียกฟังก์ชันเช็คข้อมูลผู้ใช้ทุกๆ 10 วินาที
+    });
+  }
+
   Future<void> loadDataAstnc() async {
     // await Future.delayed(const Duration(seconds: 2), () => print("BBB"));
     var value = await Configuration.getConfig();
@@ -337,5 +356,32 @@ class _HomePage extends State<HomePage> {
 
     var json = await http.get(Uri.parse('$url/lotto/seprize'));
     lottoGetRes = lottoGetResFromJson(json.body);
+  }
+
+  Future<void> Cheackuser() async {
+    var value = await Configuration.getConfig();
+    String url = value['apiEndPoint'];
+
+    var jsonuser = await http.get(Uri.parse('$url/users/${widget.uid}'));
+    var userResponse = jsonDecode(jsonuser.body);
+
+    // ตรวจสอบว่ามีข้อมูลหรือไม่
+    if (userResponse is Map<String, dynamic> &&
+        userResponse['success'] == false) {
+      // ไม่มีข้อมูล นำทางไปยังหน้า Login และหยุดการเช็ค
+      _timer?.cancel();
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(
+          builder: (context) => LoginPage(), // เปลี่ยนเป็นหน้า Login ของคุณ
+        ),
+        (route) => false, // ลบหน้าเดิมทั้งหมดออกจาก stack
+      );
+    } else if (userResponse is List && userResponse.isNotEmpty) {
+      // มีข้อมูลผู้ใช้ ดำเนินการต่อได้
+      print('User exists: ${userResponse[0]['username']}');
+    } else {
+      // กรณีอื่น ๆ ที่ไม่ตรงกับทั้งสองแบบ
+      print('Unexpected response format');
+    }
   }
 }
