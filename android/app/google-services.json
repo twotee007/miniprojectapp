@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "461373675112",
+    "project_id": "lotto168-app",
+    "storage_bucket": "lotto168-app.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:461373675112:android:04b6586dc1d9800b820ddd",
+        "android_client_info": {
+          "package_name": "com.example.miniprojectapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAX4usYJgaege8pZo8QgZDIUUwq_eth_bo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
