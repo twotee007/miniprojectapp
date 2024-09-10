@@ -741,6 +741,15 @@ class _LottoPurchasePageState extends State<LottoPage> {
       ),
     );
 
+    if (confirm) {
+      // Clear the search fields after confirmation
+      setState(() {
+        for (var controller in controllers) {
+          controller.clear();
+        }
+      });
+    }
+
     // If user confirms
     if (confirm) {
       // Show a dialog to indicate the purchase is being processed

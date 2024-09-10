@@ -121,27 +121,47 @@ class _WalletPageState extends State<WalletPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // New Text Above the Wallet Information
-                  const Text(
-                    'วอเลท & สลาก',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontFamily: 'RhodiumLibre',
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black,
-                    ),
-                  ),
-                  InkWell(
-                    onTap: () {
-                      // Add your refresh logic here
-                      setState(() {
-                        loadData = loadDataAstnc();
-                      });
-                    },
-                    child: Icon(
-                      Icons
-                          .refresh, // You can use a different icon if you prefer
-                      color: const Color.fromARGB(255, 0, 0, 0),
-                    ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        'วอเลท & สลาก',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontFamily: 'RhodiumLibre',
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
+                        ),
+                      ),
+                      InkWell(
+                        onTap: () {
+                          setState(() {
+                            loadData = loadDataAstnc();
+                          });
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.all(5.0),
+                          decoration: BoxDecoration(
+                            color: Colors.purple, // Set background color
+                            shape: BoxShape.circle, // Circular button
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.3),
+                                spreadRadius: 2,
+                                blurRadius: 4,
+                                offset: const Offset(
+                                    0, 2), // Add shadow for emphasis
+                              ),
+                            ],
+                          ),
+                          child: const Icon(
+                            Icons.refresh,
+                            color: Colors.white,
+                            size: 28, // Make the icon slightly larger
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                   const SizedBox(height: 10),
                   // Wallet Information
