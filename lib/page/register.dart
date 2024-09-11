@@ -109,24 +109,26 @@ class _registerPageState extends State<registerPage> {
           ),
 
           // ใช้ SingleChildScrollView เพื่อให้เลื่อนเนื้อหาได้
-          Positioned.fill(
+          Positioned(
+            top: 100,
+            left: 0,
+            right: 0,
+            bottom: 0,
             child: SingleChildScrollView(
               padding: EdgeInsets.only(
-                bottom: MediaQuery.of(context).viewInsets.bottom +
-                    20, // เพิ่มระยะห่างด้านล่างเมื่อคีย์บอร์ดขึ้น
+                bottom: MediaQuery.of(context).viewInsets.bottom + 20,
               ),
               child: Padding(
-                padding: const EdgeInsets.symmetric(
-                    horizontal: 20.0), // เพิ่ม padding
+                padding: const EdgeInsets.symmetric(horizontal: 20.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    const SizedBox(height: 130), // ระยะห่างก่อนข้อความ Sign up
+                    const SizedBox(height: 40),
                     const Text(
                       'Sign up',
                       style: TextStyle(
                         fontSize: 24,
-                        color: Color(0xFF471AA0), // สีของข้อความ
+                        color: Color(0xFF471AA0),
                         fontWeight: FontWeight.bold,
                       ),
                     ),
